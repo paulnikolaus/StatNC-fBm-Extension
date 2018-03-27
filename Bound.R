@@ -1,9 +1,10 @@
-#computes the values of the backlog bounds in the reportcd
+# computes the values of the backlog bounds in the reportcd
 
 library("dvfBm")
+
 source("BeranWhittle.R")
 
-# Computes the plain SNC Bound from Theorem 3.1
+# Computes the plain SNC Bound from Theorem 3.5, Equation (3.10)
 # (without any statistical operations)
 # n = Point in time
 # x = backog
@@ -40,8 +41,8 @@ estimate_hurst <- function(FGNincrements, conflevel = 0.95,
    # l <- 1:(N - 1)
    FGNtraffic <- vector(length = length(k))
    # FGNtraffic[l] <- FBMtraffic[l+1] - FBMtraffic[l]
-   # FGNtraffic[k] <- (FGNtraffic[k] - arrival_rate)/std_dev
    FGNtraffic[k] <- (FGNincrements[k] - arrival_rate) / std_dev
+
    FBMtraffic <- cumsum(FGNtraffic)
    # FBMtraffic = FGNtraffic
 
@@ -51,7 +52,7 @@ estimate_hurst <- function(FGNincrements, conflevel = 0.95,
   Log_Periodogramm_short <- Log_Periodogramm[1:(round(length(
     Log_Periodogramm) / 10))]
   fitted <- lm(Log_Periodogramm_short~log_frequency_short)
-  y_value <- fitted$coefficients[1]
+  # y_value <- fitted$coefficients[1]
   slope <- fitted$coefficients[2]
   H_estimated <- (slope - 1) / 2
 
@@ -60,7 +61,7 @@ estimate_hurst <- function(FGNincrements, conflevel = 0.95,
   alpha <- 1 - conflevel
   interval <- qnorm(1 - alpha) * sqrt(V / N)
   H_up <- H_estimated + interval
-  print(H_up)
+  print("H_up = ")
   return(H_up)
 }
 

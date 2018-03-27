@@ -7,7 +7,7 @@ library("dvfBm")
 # Best plots EU
 library("ggplot2")
 
-source("BeranWhittle.R") # need CetaFGN()
+source("BeranWhittle.R") # CetaFGN()
 source("Bound.R") # inverse_bound()
 
 # Build a fBm flow following the Kelly model.
@@ -16,7 +16,22 @@ source("Bound.R") # inverse_bound()
 # rate = constant arrival rate, n= point in time until
 # which the traffic shall be generated, std_dev = standard_deviation.
 
-build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2^12, std_dev = 1.0) {
+build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2 ** 12,
+                       std_dev = 1.0) {
+  # Previously:
+  # cumuflow <- rep(NA, n)
+  # flow <- rep(NA, n)
+  # fbm <- circFBM(n, H, plotfBm = FALSE)
+  # for (t in 1:n) {
+  #   cumuflow[t] <- rate * t + std_dev * fbm[t]
+  #   
+  #   if (t >= 2) {
+  #     flow[t] <- cumuflow[t] - cumuflow[t - 1]
+  #   } else {
+  #     flow[t] <- cumuflow[t]
+  #   }
+  # }
+  
   fbm <- circFBM(n, H, plotfBm = FALSE)
 
   cumuflow <- arrival_rate * (1:n) + std_dev * fbm
@@ -30,9 +45,9 @@ build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2^12, std_dev = 1.0) {
 # Given a flow and a constant rate for the server, compute the backlog at
 # each point in time
 # Flow = FGN Arrival Flow, server_rate = constant Server rate, n=point in time
-# until which the backlog shall be simulated
+# until which the backlog should be simulated
 
-simulate_system <- function(flow, server_rate = 2.0, n = 2^12) {
+simulate_system <- function(flow, server_rate = 2.0, n = 2 ** 12) {
   backlog <- rep(NA, n)
   backlog[1] <- 0
   for (i in 2:n) {
@@ -45,8 +60,8 @@ simulate_system <- function(flow, server_rate = 2.0, n = 2^12) {
 # for FGN arrivals with mean arrival rate, Hurst parameter H and
 # standard deviation std_dev at a server with the given server rate
 
-compute_distribution <- function(iterations = 10^6, arrival_rate = 1.0,
-                                 H = 0.7, n = 10^4, std_dev = 1.0,
+compute_distribution <- function(iterations = 10 ** 6, arrival_rate = 1.0,
+                                 H = 0.7, n = 10 ** 4, std_dev = 1.0,
                                  server_rate = 2.0) {
   backlogs <- rep(NA, iterations)
 
@@ -57,13 +72,13 @@ compute_distribution <- function(iterations = 10^6, arrival_rate = 1.0,
     for (k in 1:n) {
       b <- max(b + flow[k] - server_rate, 0)
     }
-    .showProgress(i, iterations)
+    .show_progress(i, iterations)
     backlogs[i] <- b
   }
   return(backlogs)
 }
 
-.showProgress <- function(it, max_iterations) {
+.show_progress <- function(it, max_iterations) {
   perc <- round(max_iterations / 10)
   if (it %% perc == 0) {
     print(it * 100 / max_iterations)
