@@ -33,13 +33,17 @@ build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2 ** 12,
   # }
   
   fbm <- circFBM(n, H, plotfBm = FALSE)
+  # work_around to avoid completely negative traffic
+  while (mean(fbm) < 0) {
+    fbm <- circFBM(n, H, plotfBm = FALSE)
+  }
 
   cumuflow <- arrival_rate * (1:n) + std_dev * fbm
   cumuflow_shift <- c(0, cumuflow[-length(cumuflow)])
 
-  flow <- cumuflow - cumuflow_shift
+  flow_increments <- cumuflow - cumuflow_shift
 
-  return(flow)
+  return(flow_increments)
 }
 
 # Given a flow and a constant rate for the server, compute the backlog at
@@ -47,11 +51,11 @@ build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2 ** 12,
 # Flow = FGN Arrival Flow, server_rate = constant Server rate, n=point in time
 # until which the backlog should be simulated
 
-simulate_system <- function(flow, server_rate = 2.0, n = 2 ** 12) {
+simulate_system <- function(flow_increments, server_rate = 2.0, n = 2 ** 12) {
   backlog <- rep(NA, n)
   backlog[1] <- 0
   for (i in 2:n) {
-  	backlog[i] <- max(backlog[i - 1] + flow[i - 1] - server_rate, 0)
+  	backlog[i] <- max(backlog[i - 1] + flow_increments[i - 1] - server_rate, 0)
   }
   return(backlog)
 }

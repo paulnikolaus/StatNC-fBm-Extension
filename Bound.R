@@ -41,20 +41,33 @@ estimate_hurst <- function(FGNincrements, conflevel = 0.95,
    # l <- 1:(N - 1)
    FGNtraffic <- vector(length = length(k))
    # FGNtraffic[l] <- FBMtraffic[l+1] - FBMtraffic[l]
-   FGNtraffic[k] <- (FGNincrements[k] - arrival_rate) / std_dev
+   # FGNtraffic[k] <- (FGNincrements[k] - arrival_rate) / std_dev
+   FGNtraffic <- (FGNincrements - arrival_rate) / std_dev
 
    FBMtraffic <- cumsum(FGNtraffic)
+   # print(FBMtraffic)
    # FBMtraffic = FGNtraffic
 
   log_frequency <- log(spec.pgram(FBMtraffic)$freq)
-  log_frequency_short <- log_frequency[1:(round(length(log_frequency) / 10))]
-  Log_Periodogramm <- log(spec.pgram(FBMtraffic)$spec)
-  Log_Periodogramm_short <- Log_Periodogramm[1:(round(length(
-    Log_Periodogramm) / 10))]
-  fitted <- lm(Log_Periodogramm_short~log_frequency_short)
+  log_frequency_short <- use_only_first_part(log_frequency, 0.1)
+
+  log_periodogram <- log(spec.pgram(FBMtraffic)$spec)
+  log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
+
+  fitted <- lm(log_periodogram_short~log_frequency_short)
   # y_value <- fitted$coefficients[1]
   slope <- fitted$coefficients[2]
-  H_estimated <- (slope - 1) / 2
+  # TODO: estimated slope is way too small
+  # It should be around -0.4, not - 2.32
+  print("slope")
+  print(slope)
+  H_estimated <- (1 - slope) / 2
+
+  if (H_estimated) {
+    print("H_estimated")
+    print(H_estimated)
+    stop("H must be between 0.5 and 1")
+  }
 
   D <- CetaFGN(eta = c(H = H_estimated))
   V <- 2 * D  **  (-1)
@@ -161,4 +174,8 @@ inverse_bound <- function(n = 10, p = 10  **  (-2), std_dev = 0.5, H = 0.7,
     its <- its + 1
   }
   return(max(0, backlog))
+}
+
+use_only_first_part <- function(input_vector, share) {
+  return(input_vector[1:(round(length(input_vector) * share))])
 }
