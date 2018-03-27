@@ -42,14 +42,17 @@ simulate_system <- function(flow, server_rate = 2.0, n = 2^12) {
 }
 
 # Computes the empricial backlog distribution for a specific point in time
-# for FGN arrivals with mean rate, Hurst parameter H and standard deviation std_dev
-# at a server with the given rate
+# for FGN arrivals with mean arrival rate, Hurst parameter H and
+# standard deviation std_dev at a server with the given server rate
 
-compute_distribution = function(iterations = 10^6, rate = 1.0, H = 0.7,
-                                 n = 10^4, std_dev = 1.0, server_rate = 2.0) {
+compute_distribution <- function(iterations = 10^6, arrival_rate = 1.0,
+                                 H = 0.7, n = 10^4, std_dev = 1.0,
+                                 server_rate = 2.0) {
   backlogs <- rep(NA, iterations)
-    for (i in 1:iterations) {
-    flow <- build_flow(rate = rate, H = H, n = n, std_dev = std_dev)
+
+  for (i in 1:iterations) {
+    flow <- build_flow(arrival_rate = arrival_rate, H = H, n = n,
+                       std_dev = std_dev)
     b <- 0
     for (k in 1:n) {
       b <- max(b + flow[k] - server_rate, 0)
