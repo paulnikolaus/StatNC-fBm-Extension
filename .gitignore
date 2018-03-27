@@ -1,1 +1,3 @@
 *.exe
+*.RData
+*.Rhistory
