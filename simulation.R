@@ -2,7 +2,7 @@
 ## This file holds the necessary functions for the simulation.
 
 # Libraries.
-# For circFbm 
+# For circFbm
 library("dvfBm")
 # Best plots EU
 library("ggplot2")
@@ -16,19 +16,14 @@ source("Bound.R") # inverse_bound()
 # rate = constant arrival rate, n= point in time until
 # which the traffic shall be generated, std_dev = standard_deviation.
 
-build_flow <- function(rate = 1.0, H = 0.7, n = 2^12, std_dev = 1.0) {
-  cumuflow <- rep(NA, n)
-  flow <- rep(NA, n)
+build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2^12, std_dev = 1.0) {
   fbm <- circFBM(n, H, plotfBm = FALSE)
-  for (t in 1:n) {
-    cumuflow[t] <- rate * t + sigma * fbm[t]
 
-    if (t >= 2) {
-      flow[t] <- cumuflow[t] - cumuflow[t - 1]
-    } else {
-      flow[t] <- cumuflow[t]
-    }
-  }
+  cumuflow <- arrival_rate * (1:n) + std_dev * fbm
+  cumuflow_shift <- c(0, cumuflow[-length(cumuflow)])
+
+  flow <- cumuflow - cumuflow_shift
+
   return(flow)
 }
 
@@ -37,7 +32,7 @@ build_flow <- function(rate = 1.0, H = 0.7, n = 2^12, std_dev = 1.0) {
 # Flow = FGN Arrival Flow, server_rate = constant Server rate, n=point in time
 # until which the backlog shall be simulated
 
-simulate_system = function(flow, server_rate = 2.0, n = 2^12) {
+simulate_system <- function(flow, server_rate = 2.0, n = 2^12) {
   backlog <- rep(NA, n)
   backlog[1] <- 0
   for (i in 2:n) {
@@ -65,8 +60,8 @@ compute_distribution = function(iterations = 10^6, rate = 1.0, H = 0.7,
   return(backlogs)
 }
 
-.showProgress = function(it, max_iterations) {
-  perc = round(max_iterations/10)
+.showProgress <- function(it, max_iterations) {
+  perc <- round(max_iterations / 10)
   if (it %% perc == 0) {
     print(it * 100 / max_iterations)
   }
