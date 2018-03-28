@@ -21,22 +21,28 @@ build_flow <- function(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
   # Previously:
   # cumuflow <- rep(NA, n)
   # flow <- rep(NA, n)
-  # fbm <- circFBM(n, h, plotfBm = FALSE)
+  # fbm <- circFBM(n, hurst, plotfBm = FALSE)
   # for (t in 1:n) {
-  #   cumuflow[t] <- rate * t + std_dev * fbm[t]
-  #   
+  #   cumuflow[t] <- arrival_rate * t + std_dev * fbm[t]
+  # 
   #   if (t >= 2) {
   #     flow[t] <- cumuflow[t] - cumuflow[t - 1]
   #   } else {
   #     flow[t] <- cumuflow[t]
   #   }
   # }
+  # 
+  # return(flow)
   
-  fbm <- circFBM(n, hurst, plotfBm = FALSE)
+  # changed fbm to fbm * (n ** hurst) as the package documentations
+  # says that fbm is otherwise only created in the interval
+  # 0, ..., (n - 1) / n
+  fbm <- circFBM(n = n, H = hurst, plotfBm = FALSE) * (n ** hurst)
+  
   # work_around to avoid completely negative traffic
-  while (mean(fbm) < 0) {
-    fbm <- circFBM(n, hurst, plotfBm = FALSE)
-  }
+  # while (mean(fbm) < 0) {
+  #   fbm <- circFBM(n, hurst, plotfBm = FALSE)
+  # }
 
   cumuflow <- arrival_rate * (1:n) + std_dev * fbm
   cumuflow_shift <- c(0, cumuflow[-length(cumuflow)])
@@ -61,10 +67,10 @@ simulate_system <- function(flow_increments, server_rate = 2.0, n = 2 ** 12) {
 }
 
 # Computes the empricial backlog distribution for a specific point in time
-# for FGN arrivals with mean arrival rate, Hurst parameter H and
+# for FGN arrivals with mean arrival rate, Hurst parameter hurst and
 # standard deviation std_dev at a server with the given server rate
 
-compute_distribution <- function(iterations = 10 ** 6, arrival_rate = 1.0,
+compute_distribution <- function(iterations = 10 ** 3, arrival_rate = 1.0,
                                  hurst = 0.7, n = 10 ** 4, std_dev = 1.0,
                                  server_rate = 2.0) {
   backlogs <- rep(NA, iterations)
@@ -85,6 +91,6 @@ compute_distribution <- function(iterations = 10 ** 6, arrival_rate = 1.0,
 .show_progress <- function(it, max_iterations) {
   perc <- round(max_iterations / 10)
   if (it %% perc == 0) {
-    print(it * 100 / max_iterations)
+    print(paste0(it * 100 / max_iterations, "%"))
   }
 }

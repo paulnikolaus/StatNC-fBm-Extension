@@ -3,6 +3,9 @@ source("BeranWhittle.R")
 # Estimates the Hurst parameter of the given traffic
 # (we assume Kelly's traffic model)
 # with periodograms
+# TODO: Rose: In most cases, this will lead to a wrong estimate of H 
+# -> better to use other estimator
+
 # flow_increments = flow_increments
 # arrival_rate = constant rate of the flow, also denoted \lambda
 # std_dev = standard deviation
@@ -13,6 +16,7 @@ estimate_hurst <- function(flow_increments, arrival_rate = 1.0, std_dev = 1.0) {
    fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
    # fbm_traffic <- cumsum(fgn_traffic)
+   # Rose: "For FGN and FARIMA...", i.e., we don't use FBM
 
   log_frequency <- log(spec.pgram(fgn_traffic)$freq)
   log_frequency_short <- use_only_first_part(log_frequency, 0.1)
@@ -24,8 +28,7 @@ estimate_hurst <- function(flow_increments, arrival_rate = 1.0, std_dev = 1.0) {
   # y_value <- fitted$coefficients[1]
   slope <- fitted$coefficients[2]
   
-  print("slope")
-  print(slope)
+  # print(slope)
   h_estimated <- (1 - slope) / 2
 
   if (h_estimated >= 1 || h_estimated <= 0.5) {
@@ -52,7 +55,7 @@ conf_level_hurst <- function(amount_increments, h_estimated,
   alpha <- 1 - conflevel
   interval <- qnorm(1 - alpha) * sqrt(V / N)
   H_up <- h_estimated + interval
-  print("H_up = ")
+
   return(H_up)
 }
 
