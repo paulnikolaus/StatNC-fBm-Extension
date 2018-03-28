@@ -1,3 +1,4 @@
+##### estimate_hurst.R #####
 source("BeranWhittle.R")
 
 # Estimates the Hurst parameter of the given traffic
@@ -9,10 +10,8 @@ source("BeranWhittle.R")
 # flow_increments = flow_increments
 # arrival_rate = constant rate of the flow, also denoted \lambda
 # std_dev = standard deviation
-estimate_hurst <- function(flow_increments, arrival_rate = 1.0, std_dev = 1.0) {
-   # Extract the gaussian noise from increments
-   N <- length(flow_increments)
-   
+estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
+   # Extract the gaussian noise from flow increments
    fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
    # fbm_traffic <- cumsum(fgn_traffic)
@@ -40,6 +39,12 @@ estimate_hurst <- function(flow_increments, arrival_rate = 1.0, std_dev = 1.0) {
   return(h_estimated)
 }
 
+# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
+#                            std_dev = 1.0)
+# print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
+#                      std_dev = 1.0))
+
+
 # Gives the confidence interval for the Hurst estimator
 # using the periodogram approach in Rose
 # amount_increments = length of the fbm_traffic vector
@@ -58,6 +63,13 @@ conf_level_hurst <- function(amount_increments, h_estimated,
 
   return(H_up)
 }
+
+# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
+#                            std_dev = 1.0)
+# N <- length(flow_example)
+# print(conf_level_hurst(amount_increments = N, h_estimated = 0.7,
+#                        conflevel = 0.95))
+
 
 use_only_first_part <- function(input_vector, share) {
   return(input_vector[1:(round(length(input_vector) * share))])
