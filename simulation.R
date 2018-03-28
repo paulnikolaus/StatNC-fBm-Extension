@@ -16,12 +16,12 @@ source("Bound.R") # inverse_bound()
 # rate = constant arrival rate, n= point in time until
 # which the traffic shall be generated, std_dev = standard_deviation.
 
-build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2 ** 12,
+build_flow <- function(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
                        std_dev = 1.0) {
   # Previously:
   # cumuflow <- rep(NA, n)
   # flow <- rep(NA, n)
-  # fbm <- circFBM(n, H, plotfBm = FALSE)
+  # fbm <- circFBM(n, h, plotfBm = FALSE)
   # for (t in 1:n) {
   #   cumuflow[t] <- rate * t + std_dev * fbm[t]
   #   
@@ -32,10 +32,10 @@ build_flow <- function(arrival_rate = 1.0, H = 0.7, n = 2 ** 12,
   #   }
   # }
   
-  fbm <- circFBM(n, H, plotfBm = FALSE)
+  fbm <- circFBM(n, hurst, plotfBm = FALSE)
   # work_around to avoid completely negative traffic
   while (mean(fbm) < 0) {
-    fbm <- circFBM(n, H, plotfBm = FALSE)
+    fbm <- circFBM(n, hurst, plotfBm = FALSE)
   }
 
   cumuflow <- arrival_rate * (1:n) + std_dev * fbm
@@ -65,12 +65,12 @@ simulate_system <- function(flow_increments, server_rate = 2.0, n = 2 ** 12) {
 # standard deviation std_dev at a server with the given server rate
 
 compute_distribution <- function(iterations = 10 ** 6, arrival_rate = 1.0,
-                                 H = 0.7, n = 10 ** 4, std_dev = 1.0,
+                                 hurst = 0.7, n = 10 ** 4, std_dev = 1.0,
                                  server_rate = 2.0) {
   backlogs <- rep(NA, iterations)
 
   for (i in 1:iterations) {
-    flow <- build_flow(arrival_rate = arrival_rate, H = H, n = n,
+    flow <- build_flow(arrival_rate = arrival_rate, hurst = hurst, n = n,
                        std_dev = std_dev)
     b <- 0
     for (k in 1:n) {
