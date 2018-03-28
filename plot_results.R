@@ -2,7 +2,6 @@
 # File to visualize the results
 
 # Plots the empirical backlog distribution.
-# It's a mess of old and new code, better not touch it. But it works...
 
 plot_distribution <- function(computed_dist, stat, trad, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
@@ -76,6 +75,6 @@ plot_and_bound <- function(
 }
 
 print(plot_and_bound(
-  arrival_rate = 10 ** (-3), hurst = 0.7, n = 10 ** 2,
+  arrival_rate = 10 ** (-3), hurst = 0.7, n = 2*10 ** 2,
   server_rate = 5*10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 3 - 1))
