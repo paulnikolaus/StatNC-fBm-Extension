@@ -42,7 +42,11 @@ stat_backlog_bound <- function(FGNincrements, n = 10, x = 3.0, std_dev = 1.0,
     stop("The server rate has to be greater than the arrival rate")
   }
 
-  H_up <- estimate_hurst(FGNincrements, arrival_rate, std_dev)
+  N <- length(FGNincrements)
+
+  h_estimated <- estimate_hurst(FGNincrements, arrival_rate, std_dev)
+  H_up <- conf_level_hurst(N, h_estimated, conflevel)
+
   backlog_prob <- 1 - conflevel + backlog_bound(
     n = n, x = x, std_dev = std_dev, H = H_up,
     server_rate = server_rate, arrival_rate = arrival_rate)
