@@ -2,7 +2,7 @@
 
 library("dvfBm")
 
-source("BeranWhittle.R")
+source("estimate_hurst.R")
 
 # Computes the plain SNC Bound from Theorem 3.5, Equation (3.10)
 # (without any statistical operations)
@@ -24,58 +24,6 @@ backlog_bound <- function(n = 10, x = 3.0, std_dev = 0.5, H = 0.75,
   backlog <- sum(exp(exponent))
 
   return(backlog)
-}
-
-# Estimates the Hurst parameter of the given traffic
-# (we assume Kelly's traffic model)
-# with the Rose estimator
-# FGNincrements = flow
-# conflevel = confidence level of the confidence interval
-# arrival_rate = constant rate of the flow, also denoted \lambda
-# std_dev = standard deviation
-estimate_hurst <- function(FGNincrements, conflevel = 0.95,
-                           arrival_rate = 1.0, std_dev = 1.0) {
-  # Extract the gaussian noise from increments
-   N <- length(FGNincrements)
-   k <- 1:N
-   # l <- 1:(N - 1)
-   FGNtraffic <- vector(length = length(k))
-   # FGNtraffic[l] <- FBMtraffic[l+1] - FBMtraffic[l]
-   # FGNtraffic[k] <- (FGNincrements[k] - arrival_rate) / std_dev
-   FGNtraffic <- (FGNincrements - arrival_rate) / std_dev
-
-   FBMtraffic <- cumsum(FGNtraffic)
-   # print(FBMtraffic)
-   # FBMtraffic = FGNtraffic
-
-  log_frequency <- log(spec.pgram(FBMtraffic)$freq)
-  log_frequency_short <- use_only_first_part(log_frequency, 0.1)
-
-  log_periodogram <- log(spec.pgram(FBMtraffic)$spec)
-  log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
-
-  fitted <- lm(log_periodogram_short~log_frequency_short)
-  # y_value <- fitted$coefficients[1]
-  slope <- fitted$coefficients[2]
-  # TODO: estimated slope is way too small
-  # It should be around -0.4, not - 2.32
-  print("slope")
-  print(slope)
-  H_estimated <- (1 - slope) / 2
-
-  if (H_estimated) {
-    print("H_estimated")
-    print(H_estimated)
-    stop("H must be between 0.5 and 1")
-  }
-
-  D <- CetaFGN(eta = c(H = H_estimated))
-  V <- 2 * D  **  (-1)
-  alpha <- 1 - conflevel
-  interval <- qnorm(1 - alpha) * sqrt(V / N)
-  H_up <- H_estimated + interval
-  print("H_up = ")
-  return(H_up)
 }
 
 # Computes the statistical backlog bound based on the FGN increments
@@ -174,8 +122,4 @@ inverse_bound <- function(n = 10, p = 10  **  (-2), std_dev = 0.5, H = 0.7,
     its <- its + 1
   }
   return(max(0, backlog))
-}
-
-use_only_first_part <- function(input_vector, share) {
-  return(input_vector[1:(round(length(input_vector) * share))])
 }
