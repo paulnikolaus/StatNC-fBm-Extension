@@ -26,8 +26,39 @@ backlog_bound <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
   return(backlog)
 }
 
-# print(backlog_bound(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-#                     server_rate = 1.0, arrival_rate = 0.6))
+print("wrong bound:")
+print(backlog_bound(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+                    server_rate = 1.0, arrival_rate = 0.6))
+
+# Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
+# (without any statistical operations)
+# n = Point in time
+# x = backog
+# std_dev = standard deviation,
+# hurst = Hurst Parameter
+# server_rate = Server Rate, also denoted C in formulas,
+# arrival_rate = constant rate from the arrival model, also denoted as \lambda
+# tau = discretization parameter > 0
+backlog_bound_discr <- function(n, x, std_dev, hurst, server_rate,
+                                arrival_rate, tau = 0.9) {
+  if (server_rate <= arrival_rate) {
+    stop("server rate has to be greater than the arrival rate")
+  }
+
+  k <- (floor(1 / tau) - 1):(floor(n / tau) - 1)
+  exponent <- -((x - server_rate * tau + (
+    server_rate - arrival_rate) * k * tau) ** 2) / (
+    2 * (std_dev ** 2) * (k * tau) ** (2 * hurst))
+  backlog <- sum(exp(exponent))
+
+  return(backlog)
+}
+
+print("discretized bound:")
+for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
+  print(backlog_bound_discr(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+                            server_rate = 1.0, arrival_rate = 0.6, tau = tau))
+}
 
 # Computes the statistical backlog bound based on the FGN increments
 # (Statistical version of theorem 3.1)
@@ -57,7 +88,7 @@ stat_backlog_bound <- function(flow_increments, n, x, std_dev,server_rate,
   backlog_prob <- (1 - conflevel) + backlog_bound(
     n = n, x = x, std_dev = std_dev, hurst = h_up,
     server_rate = server_rate, arrival_rate = arrival_rate)
-  
+
   # print(paste0("x = ", x, ", backlog_prob = ", backlog_prob))
 
   return(backlog_prob)
@@ -88,7 +119,7 @@ inverse_bound <- function(n, std_dev, hurst,
   if (estimate_traffic && is.nan(estimate_traffic)) {
     stop("We need some traffic to estimate")
   }
-  
+
   if (estimate_traffic && p < (1 - conflevel)) {
     print(paste0("p = ", p, " 1 - conflevel = ", 1 - conflevel))
     stop("The bound runs in an infinite loop as the stat_backlog_bound()
@@ -126,7 +157,7 @@ inverse_bound <- function(n, std_dev, hurst,
                                  arrival_rate = arrival_rate)
     }
   }
-  
+
   difference <- difference / 2
   backlog <- backlog - difference
   # Bisect $splits times

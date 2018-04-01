@@ -4,7 +4,7 @@ source("BeranWhittle.R")
 # Estimates the Hurst parameter of the given traffic
 # (we assume Kelly's traffic model)
 # with periodograms
-# TODO: Rose: In most cases, this will lead to a wrong estimate of H 
+# TODO: Rose: In most cases, this will lead to a wrong estimate of H
 # -> better to use other estimator
 
 # flow_increments = flow_increments
@@ -26,7 +26,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   fitted <- lm(log_periodogram_short~log_frequency_short)
   # y_value <- fitted$coefficients[1]
   slope <- fitted$coefficients[2]
-  
+
   # print(slope)
   h_estimated <- (1 - slope) / 2
 
@@ -35,7 +35,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
     print(h_estimated)
     stop("h_estimated must be in (0.5, 1)")
   }
-  
+
   return(h_estimated)
 }
 
@@ -54,7 +54,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 conf_level_hurst <- function(amount_increments, h_estimated,
                              conflevel = 0.95) {
   N <- amount_increments
-  
+
   D <- CetaFGN(eta = c(H = h_estimated))
   V <- 2 * D  **  (-1)
   alpha <- 1 - conflevel
