@@ -60,6 +60,9 @@ for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
                             server_rate = 1.0, arrival_rate = 0.6, tau = tau))
 }
 
+# numerical evuluation shows that a tau value of 0.85 is optimal for a given
+# paramter set and, more importanty, that the bound get 3 times worse
+
 # Computes the statistical backlog bound based on the FGN increments
 # (Statistical version of theorem 3.1)
 # n = Point in Time
