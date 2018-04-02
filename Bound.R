@@ -26,9 +26,9 @@ backlog_bound <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
   return(backlog)
 }
 
-print("wrong bound:")
-print(backlog_bound(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-                    server_rate = 1.0, arrival_rate = 0.6))
+# print("wrong bound:")
+# print(backlog_bound(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#                     server_rate = 1.0, arrival_rate = 0.6))
 
 # Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
 # (without any statistical operations)
@@ -45,7 +45,7 @@ backlog_bound_discr <- function(n, x, std_dev, hurst, server_rate,
     stop("server rate has to be greater than the arrival rate")
   }
 
-  k <- (floor(1 / tau) - 1):(floor(n / tau) - 1)
+  k <- (floor(1 / tau) + 1):(floor(n / tau) + 1)
   exponent <- -((x - server_rate * tau + (
     server_rate - arrival_rate) * k * tau) ** 2) / (
     2 * (std_dev ** 2) * (k * tau) ** (2 * hurst))
@@ -54,14 +54,36 @@ backlog_bound_discr <- function(n, x, std_dev, hurst, server_rate,
   return(backlog)
 }
 
-print("discretized bound:")
-for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
-  print(backlog_bound_discr(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-                            server_rate = 1.0, arrival_rate = 0.6, tau = tau))
-}
+# print("discretized bound:")
+# print(backlog_bound_discr(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#                           server_rate = 1.0, arrival_rate = 0.6, tau = 1.0))
+
+# for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
+#   print(backlog_bound_discr(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#                             server_rate = 1.0, arrival_rate = 0.6, tau = tau))
+# }
 
 # numerical evuluation shows that a tau value of 0.85 is optimal for a given
-# paramter set and, more importanty, that the bound get 3 times worse
+# paramter set
+
+# for (x in c(3.0, 5.0, 7.0, 10.0)) {
+#   print("wrong bound:")
+#   print(backlog_bound(n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+#                       server_rate = 1.0, arrival_rate = 0.6))
+#   print("discretized bound:")
+  # print(backlog_bound_discr(n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+  #                           server_rate = 1.0, arrival_rate = 0.6,
+  #                           tau = 0.85))
+  # print(backlog_bound_discr(n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+  #                           server_rate = 1.0, arrival_rate = 0.6,
+  #                           tau = 0.9))
+# }
+
+# We observe that the discretization gap becomes less significant
+# for a larger backlog
+# (as the term server_rate * tau in the numerator gets smaller than
+# the backlog x)
+
 
 # Computes the statistical backlog bound based on the FGN increments
 # (Statistical version of theorem 3.1)
