@@ -13,7 +13,7 @@ source("estimate_hurst.R")
 # hurst = Hurst Parameter
 # server_rate = Server Rate, also denoted C in formulas,
 # arrival_rate = constant rate from the arrival model, also denoted as \lambda
-backlog_bound <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
+backlog_bound_wrong <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
@@ -39,7 +39,7 @@ backlog_bound <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
 # server_rate = Server Rate, also denoted C in formulas,
 # arrival_rate = constant rate from the arrival model, also denoted as \lambda
 # tau = discretization parameter > 0
-backlog_bound_discr <- function(n, x, std_dev, hurst, server_rate,
+backlog_bound <- function(n, x, std_dev, hurst, server_rate,
                                 arrival_rate, tau = 0.9) {
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
@@ -94,7 +94,7 @@ backlog_bound_discr <- function(n, x, std_dev, hurst, server_rate,
 # arrival_rate = constant arrival rate, also denoted \lambda
 # conflevel = confidence level of estimation
 
-stat_backlog_bound <- function(flow_increments, n, x, std_dev,server_rate,
+stat_backlog_bound <- function(flow_increments, n, x, std_dev, server_rate,
                                arrival_rate, conflevel = 0.95) {
   if (server_rate < arrival_rate) {
     stop("The server rate has to be greater than the arrival rate")
