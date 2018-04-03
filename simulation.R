@@ -98,26 +98,39 @@ compute_distribution <- function(arrival_rate, hurst, L, n, server_rate,
 }
 
 # Helper function to calculate confidence intervals
-CI = function(data, conf.level = 0.95) {
+CI <- function(data, conf.level = 0.95) {
   # Check if all data entries are equal -> No confidence interval
-  if(all(data == data[1])) {
+  if (all(data == data[1])) {
     return(c(data[1], data[1]))
   }
-  
-  t = t.test(data, conf.level = conf.level)$conf.int
+
+  t <- t.test(data, conf.level = conf.level)$conf.int
   return(c(t[1], t[2]))
 }
 
 # Compute a confidence interval for the estimation of H
+<<<<<<< HEAD
 confint_h_up <- function(L, arrival_rate, hurst, std_dev, conflevel, iterations, confint.conflevel) {
   hurst_estimates = rep(NA, iterations)
   for (i in 1:iterations) {
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst, L = L, std_dev = std_dev)
     hurst_estimates[i] <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
+=======
+# TODO: conflevel and confint.conflevel?
+confint_h_up <- function(arrival_rate, hurst, std_dev, conflevel, iterations,
+                         confint.conflevel) {
+  hurst_estimates <- rep(NA, iterations)
+  for (i in 1:iterations) {
+    f <- build_flow(
+      arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10,
+      std_dev = std_dev)
+    hurst_estimates[i] <- flow_to_h_up(
+      f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
+>>>>>>> 6d31e627fc8da824f065cbcd621e227004690fcc
   }
-  ci = CI(hurst_estimates, conf.level = confint.conflevel)
-  m = mean(hurst_estimates)
+  ci <- CI(hurst_estimates, conf.level = confint.conflevel)
+  m <- mean(hurst_estimates)
   return(append(m, ci))
 }
 

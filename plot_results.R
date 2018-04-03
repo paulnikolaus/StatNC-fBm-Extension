@@ -71,11 +71,9 @@ plot_and_bound <- function(
   h.confint <- confint_h_up(L = L, arrival_rate = arrival_rate, hurst = hurst, 
                             std_dev = std_dev, conflevel = conflevel, 
                             iterations=10, confint.conflevel=0.95)
-  #f <- build_flow(
-  #  arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
   #h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
   #print(paste0("h_up =", h_up))
-  
+
   stat_mean <- inverse_bound(
     n = n, std_dev = std_dev, hurst = h.confint[1], arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
@@ -88,7 +86,7 @@ plot_and_bound <- function(
     n = n, std_dev = std_dev, hurst = h.confint[3], arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
-  
+
   plot_distribution(computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
                     stat_upper = stat_upper, trad = bound)
 
@@ -96,6 +94,8 @@ plot_and_bound <- function(
   #qplot(x=1:length(d), y=d) + geom_line(aes(y=bound, colour="bound"))
   #return(list("SNC" = bound, "distribution" = d))
 }
+
+pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(plot_and_bound(
   L = 2 * 10 **2,
@@ -106,3 +106,5 @@ print(plot_and_bound(
 # results:
 # blue line (SNC-bound?): 178.4
 # yellow line (StatNC-bound?): 617.4
+
+dev.off()
