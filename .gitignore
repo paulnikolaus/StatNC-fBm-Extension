@@ -1,6 +1,7 @@
 *.exe
 *.RData
 *.Rhistory
+*.pdf
 .vscode/
 
 .DS_Store
