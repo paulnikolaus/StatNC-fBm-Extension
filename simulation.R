@@ -8,7 +8,6 @@ library("dvfBm")
 library("ggplot2")
 
 source("BeranWhittle.R") # CetaFGN()
-source("Bound.R") # inverse_bound()
 
 # Build a fBm flow following the Kelly model.
 # First a cumulative FBM flow is built and then divided into FGN increments

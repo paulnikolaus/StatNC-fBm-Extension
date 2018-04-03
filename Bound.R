@@ -4,22 +4,23 @@
 library("dvfBm")
 
 source("estimate_hurst.R")
+source("simulation.R")
 
 # Computes the plain SNC Bound from Theorem 3.5, Equation (3.10)
 # (without any statistical operations)
-# n = Point in time
+# sim_length = Point in time
 # x = backog
 # std_dev = standard deviation,
 # hurst = Hurst Parameter
 # server_rate = Server Rate, also denoted C in formulas,
 # arrival_rate = constant rate from the arrival model, also denoted as \lambda
-backlog_bound_wrong <- function(n, x, std_dev, hurst, server_rate,
+backlog_bound_wrong <- function(sim_length, x, std_dev, hurst, server_rate,
                                 arrival_rate) {
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
 
-  k <- 1:n
+  k <- 1:sim_length
   exponent <- -((x + (server_rate - arrival_rate) * k) ** 2) / (
     2 * (std_dev ** 2) * k ** (2 * hurst))
   backlog <- sum(exp(exponent))
@@ -28,12 +29,12 @@ backlog_bound_wrong <- function(n, x, std_dev, hurst, server_rate,
 }
 
 # print("wrong bound:")
-# print(backlog_bound(n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+# print(backlog_bound(sim_length = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
 #                     server_rate = 1.0, arrival_rate = 0.6))
 
 # Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
 # (without any statistical operations)
-# n = Point in time
+# sim_length = Point in time
 # x = backog
 # std_dev = standard deviation,
 # hurst = Hurst Parameter
@@ -88,7 +89,7 @@ backlog_bound <- function(sim_length, x, std_dev, hurst, server_rate,
 
 # Computes the statistical backlog bound based on the FGN increments
 # (Statistical version of theorem 3.1)
-# n = Point in Time
+# sim_length = Point in Time
 # x = Backlog
 # std_dev = standard deviation
 # hurst = the estimated hurst parameter
@@ -112,15 +113,15 @@ stat_backlog_bound <- function(sim_length, x, std_dev, hurst, server_rate,
 }
 
 
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
+# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, sim_length = 2 ** 12,
 #                            std_dev = 1.0)
-# print(stat_backlog_bound(flow_increments = flow_example, n = 10, x = 3.0,
+# print(stat_backlog_bound(flow_increments = flow_example, sim_length = 10, x = 3.0,
 #                          std_dev = 1.0, server_rate = 1.0, arrival_rate = 0.6,
 #                          conflevel = 0.95))
 
 # Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
 # last parameter indicates whether SNC or stat_nc bound should be used
-# n = Point in time
+# sim_length = Point in time
 # p = violation probability
 # std_dev = standard deviation
 # hurst = Hurst parameter
@@ -144,32 +145,34 @@ inverse_bound <- function(sim_length, std_dev, hurst,
   difference <- 1
   its <- 0
 
+  stat_backlog_bound_short <- function(backlog) {
+    return(stat_backlog_bound(
+      sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
+      server_rate = server_rate, arrival_rate = arrival_rate,
+      conflevel = conflevel))
+  }
+  
+  backlog_bound_short <- function(backlog) {
+    return(backlog_bound(
+      sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
+      server_rate = server_rate, arrival_rate = arrival_rate))
+  }
+
   # Search for the backlog value where bound <= p holds for the first time,
   # bisect from there
 
   if (estimated_h) {
-    probbound <- stat_backlog_bound(
-      sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
-      server_rate = server_rate, arrival_rate = arrival_rate,
-      conflevel = conflevel)
+    probbound <- stat_backlog_bound_short(backlog = backlog)
   } else {
-    probbound <- backlog_bound(
-      sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
-      server_rate = server_rate, arrival_rate = arrival_rate)
+    probbound <- backlog_bound_short(backlog = backlog)
   }
   while (probbound > p) {
     difference <- backlog
     backlog <- 2 * backlog
     if (estimated_h) {
-      probbound <- stat_backlog_bound(
-        sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
-        server_rate = server_rate, arrival_rate = arrival_rate,
-        conflevel = conflevel)
+      probbound <- stat_backlog_bound_short(backlog = backlog)
     } else {
-      probbound <- backlog_bound(sim_length = sim_length, x = backlog,
-                                 std_dev = std_dev, hurst = hurst,
-                                 server_rate = server_rate,
-                                 arrival_rate = arrival_rate)
+      probbound <- backlog_bound_short(backlog = backlog)
     }
   }
 
@@ -178,21 +181,15 @@ inverse_bound <- function(sim_length, std_dev, hurst,
   # Bisect $splits times
   while (its < splits) {
     if (estimated_h) {
-      probbound <- stat_backlog_bound(
-        sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
-        server_rate = server_rate, arrival_rate = arrival_rate,
-        conflevel = conflevel)
+      probbound <- stat_backlog_bound_short(backlog = backlog)
     } else {
-      probbound <- backlog_bound(
-        sim_length = sim_length, x = backlog, std_dev = std_dev, hurst = hurst,
-        server_rate = server_rate, arrival_rate = arrival_rate)
+      probbound <- backlog_bound_short(backlog = backlog)
     }
   # If the bound is smaller -> continue with "left" half, else "right"
+    difference <- difference / 2
     if (probbound <= p ) {
-      difference <- difference / 2
       backlog <- backlog - difference
     } else {
-      difference <- difference / 2
       backlog <- backlog + difference
     }
     its <- its + 1
@@ -200,14 +197,14 @@ inverse_bound <- function(sim_length, std_dev, hurst,
   return(max(0, backlog))
 }
 
-# print(inverse_bound(n = 10, p = 10  **  (-2), std_dev = 0.5, hurst = 0.7,
-#                     arrival_rate = 0.6, server_rate = 1.0, splits = 10,
-#                     conflevel = 0.95, traffic = NaN,
-#                     estimate_traffic = FALSE))
-
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
-#                            std_dev = 1.0)
-# print(inverse_bound(n = 10, p = 10  **  (-2), std_dev = 0.5, hurst = 0.7,
-#                     arrival_rate = 0.6, server_rate = 1.0, splits = 10,
-#                     conflevel = 0.995, traffic = flow_example,
-#                     estimate_traffic = TRUE))
+# print(inverse_bound(sim_length = 100, p = 10  **  (-2), std_dev = 0.5,
+#                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
+#                     splits = 10, conflevel = 0.95, estimated_h = FALSE))
+# # result: 13.86328
+#
+# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+#                            sample_length = 2 ** 12, std_dev = 1.0)
+# print(inverse_bound(sim_length = 100, p = 10  **  (-2), std_dev = 0.5,
+#                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
+#                     splits = 10, conflevel = 0.995, estimated_h = TRUE))
+# # result: 15.38672

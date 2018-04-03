@@ -82,15 +82,18 @@ plot_and_bound <- function(
                ", Hurst_up_upper = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
-    n = n, std_dev = std_dev, hurst = h.confint[1], arrival_rate = arrival_rate,
+    sim_length = sim_length, std_dev = std_dev, hurst = h.confint[1],
+    arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   stat_lower <- inverse_bound(
-    n = n, std_dev = std_dev, hurst = h.confint[2], arrival_rate = arrival_rate,
+    sim_length = sim_length, std_dev = std_dev, hurst = h.confint[2],
+    arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   stat_upper <- inverse_bound(
-    n = n, std_dev = std_dev, hurst = h.confint[3], arrival_rate = arrival_rate,
+    sim_length = sim_length, std_dev = std_dev, hurst = h.confint[3],
+    arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
 
