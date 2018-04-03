@@ -59,7 +59,7 @@ conf_level_hurst <- function(amount_increments, h_estimated,
   V <- 2 * D  **  (-1)
   alpha <- 1 - conflevel
   interval <- qnorm(1 - alpha) * sqrt(V / N)
-  H_up <- h_estimated + interval
+  H_up <- max(h_estimated + interval, 1.0)
 
   return(H_up)
 }
