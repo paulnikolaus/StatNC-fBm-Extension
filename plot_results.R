@@ -1,7 +1,7 @@
 ##### plot_results.R #####
 # File to visualize the results
 
-source("simulation.R") # compute_distribution()
+source("simulation.R") # compute_distribution(), loads bound.R
 
 # Plots the empirical backlog distribution.
 
@@ -77,8 +77,8 @@ plot_and_bound <- function(
 }
 
 print(plot_and_bound(
-  arrival_rate = 10 ** (-3), hurst = 0.7, n = 2*10 ** 2,
-  server_rate = 5*10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
+  arrival_rate = 10 ** (-3), hurst = 0.7, n = 2 * 10 ** 2,
+  server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 3 - 1))
 
 # results:

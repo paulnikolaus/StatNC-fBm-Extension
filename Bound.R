@@ -13,7 +13,8 @@ source("estimate_hurst.R")
 # hurst = Hurst Parameter
 # server_rate = Server Rate, also denoted C in formulas,
 # arrival_rate = constant rate from the arrival model, also denoted as \lambda
-backlog_bound_wrong <- function(n, x, std_dev, hurst, server_rate, arrival_rate) {
+backlog_bound_wrong <- function(n, x, std_dev, hurst, server_rate,
+                                arrival_rate) {
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
