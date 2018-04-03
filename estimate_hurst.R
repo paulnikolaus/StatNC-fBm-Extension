@@ -90,7 +90,6 @@ flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
   h_up <- conf_level_hurst(amount_increments = amount_increments,
                            h_estimated = h_estimated, conflevel = conflevel)
   # print(paste0("h_up = ", h_up))
-  # TODO: Should be h_estimated???
   return(h_up)
 }
 
@@ -114,17 +113,17 @@ ci_help <- function(data, conf.level = 0.95) {
 confint_of_h_up <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
   confint.conflevel) {
-  hurst_estimates <- rep(NA, iterations)
+  hurst_up_estimates <- rep(NA, iterations)
   for (i in 1:iterations) {
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
-    hurst_estimates[i] <- flow_to_h_up(
+    hurst_up_estimates[i] <- flow_to_h_up(
       flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
       conflevel = conflevel)
   }
-  ci <- ci_help(data = hurst_estimates, conf.level = confint.conflevel)
-  m <- mean(hurst_estimates)
+  ci <- ci_help(data = hurst_up_estimates, conf.level = confint.conflevel)
+  m <- mean(hurst_up_estimates)
   return(append(m, ci))
 }
 
