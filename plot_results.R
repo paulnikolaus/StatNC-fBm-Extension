@@ -63,14 +63,15 @@ plot_and_bound <- function(
     n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = FALSE)
-  
+
   f <- build_flow(
     arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
-  
-  h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
-  
+
+  h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
+                       conflevel = conflevel)
+
   print(paste0("h_up =", h_up))
-  
+
   stat <- inverse_bound(
     n = n, std_dev = std_dev, hurst = h_up, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
@@ -82,6 +83,8 @@ plot_and_bound <- function(
   #return(list("SNC" = bound, "distribution" = d))
 }
 
+pdf("backlog_distribution.pdf", width = 8, height = 5)
+
 print(plot_and_bound(
   arrival_rate = 10 ** (-3), hurst = 0.7, n = 2 * 10 ** 2,
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
@@ -90,3 +93,5 @@ print(plot_and_bound(
 # results:
 # blue line (SNC-bound?): 178.4
 # yellow line (StatNC-bound?): 617.4
+
+dev.off()
