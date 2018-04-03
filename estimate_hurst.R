@@ -58,9 +58,15 @@ conf_level_hurst <- function(amount_increments, h_estimated,
   D <- CetaFGN(eta = c(H = h_estimated))
   V <- 2 * D  **  (-1)
   alpha <- 1 - conflevel
-  H_up <- min(h_estimated + qnorm(1 - alpha) * sqrt(V / N), 1.0)
+  h_up <- h_estimated + qnorm(1 - alpha) * sqrt(V / N)
 
-  return(H_up)
+  # confidence interval of hurst must be in (0, 1)
+  # Estimated hurst parameter cannot be above 1 as this gives an error
+  if (h_up > 1.0) {
+    h_up <- 1.0
+  }
+
+  return(h_up)
 }
 
 # Convenience function for estimation of h_up
