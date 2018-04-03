@@ -77,8 +77,8 @@ plot_and_bound <- function(
     confint.conflevel = 0.95)
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
-  print(paste0("Hurst_mean =", h.confint[1], "Lower =", h.confint[2],
-               "Upper=", h.confint[3]))
+  print(paste0("Hurst_mean = ", h.confint[1], "Lower = ", h.confint[2],
+               "Upper = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
     n = n, std_dev = std_dev, hurst = h.confint[1], arrival_rate = arrival_rate,
@@ -108,7 +108,7 @@ q <- plot_and_bound(
   arrival_rate = 10 ** (-3), hurst = 0.7, n = 2 * 10 ** 2,
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 3 - 1)
-pdf("backlog_distribution.pdf", width = 8, height = 5)
+# pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(q)
 
@@ -116,4 +116,4 @@ print(q)
 # blue line (SNC-bound?): 178.4
 # yellow line (StatNC-bound?): 617.4
 
-dev.off()
+# dev.off()

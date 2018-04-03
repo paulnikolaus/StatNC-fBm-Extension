@@ -67,6 +67,7 @@ simulate_system <- function(flow_increments, server_rate, sim_length) {
   backlog <- rep(NA, sim_length)
   backlog[1] <- 0
   for (i in 2:sim_length) {
+    # Lindley's equation:
     backlog[i] <- max(backlog[i - 1] + flow_increments[i - 1] - server_rate, 0)
   }
   return(backlog)
@@ -93,6 +94,7 @@ compute_distribution <- function(
       sample_length = sample_length, std_dev = std_dev)
     b <- 0
     for (k in 1:sim_length) {
+      # Lindley's equation:
       b <- max(b + flow[k] - server_rate, 0)
     }
     .show_progress(i, iterations)
@@ -102,8 +104,8 @@ compute_distribution <- function(
 }
 
 # print(compute_distribution(
-#   arrival_rate = 1.0, hurst = 0.7, sample_length = 10 ** 4, 
-#   sim_length = 10 ** 4, server_rate = 2.0, std_dev = 1.0, 
+#   arrival_rate = 1.0, hurst = 0.7, sample_length = 10 ** 4,
+#   sim_length = 10 ** 4, server_rate = 2.0, std_dev = 1.0,
 #   iterations = 10 ** 3))
 
 
