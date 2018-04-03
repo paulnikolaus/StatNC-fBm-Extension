@@ -62,20 +62,20 @@ build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
 # Flow = FGN Arrival Flow, server_rate = constant Server rate, n=point in time
 # until which the backlog should be simulated
 
-simulate_system <- function(flow_increments, server_rate, sim_length) {
-  backlog <- rep(NA, sim_length)
-  backlog[1] <- 0
-  for (i in 2:sim_length) {
-    # Lindley's equation:
-    backlog[i] <- max(backlog[i - 1] + flow_increments[i - 1] - server_rate, 0)
-  }
-  return(backlog)
-}
+# simulate_system <- function(flow_increments, server_rate, time_n) {
+#   backlog <- rep(NA, time_n)
+#   backlog[1] <- 0
+#   for (i in 2:time_n) {
+#     # Lindley's equation:
+#     backlog[i] <- max(backlog[i - 1] + flow_increments[i - 1] - server_rate, 0)
+#   }
+#   return(backlog)
+# }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # print(simulate_system(flow_increments = flow_example, server_rate = 2.0,
-#                       sim_length = 2 ** 12))
+#                       time_n = 2 ** 12))
 
 
 # Computes the empricial backlog distribution for a specific point in time
@@ -83,7 +83,7 @@ simulate_system <- function(flow_increments, server_rate, sim_length) {
 # standard deviation std_dev at a server with the given server rate
 
 compute_distribution <- function(
-  arrival_rate, hurst, sample_length, sim_length, server_rate, std_dev = 1.0,
+  arrival_rate, hurst, sample_length, time_n, server_rate, std_dev = 1.0,
   iterations = 10 ** 3) {
   backlogs <- rep(NA, iterations)
 
@@ -92,7 +92,7 @@ compute_distribution <- function(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
     b <- 0
-    for (k in 1:sim_length) {
+    for (k in 1:time_n) {
       # Lindley's equation:
       b <- max(b + flow[k] - server_rate, 0)
     }
@@ -104,7 +104,7 @@ compute_distribution <- function(
 
 # print(compute_distribution(
 #   arrival_rate = 1.0, hurst = 0.7, sample_length = 10 ** 4,
-#   sim_length = 10 ** 4, server_rate = 2.0, std_dev = 1.0,
+#   time_n = 10 ** 4, server_rate = 2.0, std_dev = 1.0,
 #   iterations = 10 ** 3))
 
 
