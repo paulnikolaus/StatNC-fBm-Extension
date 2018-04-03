@@ -64,6 +64,23 @@ conf_level_hurst <- function(amount_increments, h_estimated,
   return(H_up)
 }
 
+# Convenience function for estimation of h_up
+# flow_increments = FGN Flow
+# arrival_rate = arrival_rate used in the traffic model
+# std_dev = std_dev of flow
+
+flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
+  N <- length(flow_increments)
+  
+  h_estimated <- estimate_hurst(
+    flow_increments = flow_increments, arrival_rate = arrival_rate,
+    std_dev = std_dev)
+  h_up <- conf_level_hurst(amount_increments = N, h_estimated = h_estimated,
+                           conflevel = conflevel)
+  #print(paste0("h_up = ", h_up))
+}
+
+
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
 #                            std_dev = 1.0)
 # N <- length(flow_example)

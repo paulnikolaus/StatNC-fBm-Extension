@@ -91,28 +91,20 @@ backlog_bound <- function(n, x, std_dev, hurst, server_rate,
 # n = Point in Time
 # x = Backlog
 # std_dev = standard deviation
+# hurst = the estimated hurst parameter
 # server_rate = Server Rate, also denoted C
 # arrival_rate = constant arrival rate, also denoted \lambda
 # conflevel = confidence level of estimation
 
-stat_backlog_bound <- function(flow_increments, n, x, std_dev, server_rate,
+stat_backlog_bound <- function(n, x, std_dev, hurst, server_rate,
                                arrival_rate, conflevel = 0.95) {
   if (server_rate < arrival_rate) {
     stop("The server rate has to be greater than the arrival rate")
   }
 
-  N <- length(flow_increments)
-
-  h_estimated <- estimate_hurst(
-    flow_increments = flow_increments, arrival_rate = arrival_rate,
-    std_dev = std_dev)
-  h_up <- conf_level_hurst(amount_increments = N, h_estimated = h_estimated,
-                           conflevel = conflevel)
-  # print(paste0("h_up = ", h_up))
-
   # TODO: find a more suitable name than "backlog_prob"
   backlog_prob <- (1 - conflevel) + backlog_bound(
-    n = n, x = x, std_dev = std_dev, hurst = h_up,
+    n = n, x = x, std_dev = std_dev, hurst = hurst,
     server_rate = server_rate, arrival_rate = arrival_rate)
 
   # print(paste0("x = ", x, ", backlog_prob = ", backlog_prob))
@@ -141,12 +133,12 @@ stat_backlog_bound <- function(flow_increments, n, x, std_dev, server_rate,
 inverse_bound <- function(n, std_dev, hurst,
                           arrival_rate, server_rate, p = 10  **  (-3),
                           splits = 10, conflevel = 0.95, traffic = NaN,
-                          estimate_traffic = FALSE) {
-  if (estimate_traffic && is.nan(estimate_traffic)) {
+                          estimated_h = FALSE) {
+  if (estimated_h && is.nan(estimated_h)) {
     stop("We need some traffic to estimate")
   }
 
-  if (estimate_traffic && p < (1 - conflevel)) {
+  if (estimated_h && p < (1 - conflevel)) {
     print(paste0("p = ", p, " 1 - conflevel = ", 1 - conflevel))
     stop("The bound runs in an infinite loop as the stat_backlog_bound()
          bound can never be below (1-alpha)")
@@ -159,9 +151,9 @@ inverse_bound <- function(n, std_dev, hurst,
   # Search for the backlog value where bound <= p holds for the first time,
   # bisect from there
 
-  if (estimate_traffic) {
+  if (estimated_h) {
     probbound <- stat_backlog_bound(
-      flow_increments = traffic, n = n, x = backlog, std_dev = std_dev,
+      n = n, x = backlog, std_dev = std_dev, hurst = hurst,
       server_rate = server_rate, arrival_rate = arrival_rate,
       conflevel = conflevel)
   } else {
@@ -172,9 +164,9 @@ inverse_bound <- function(n, std_dev, hurst,
   while (probbound > p) {
     difference <- backlog
     backlog <- 2 * backlog
-    if (estimate_traffic) {
+    if (estimated_h) {
       probbound <- stat_backlog_bound(
-        flow_increments = traffic, n = n, x = backlog, std_dev = std_dev,
+        n = n, x = backlog, std_dev = std_dev, hurst = hurst,
         server_rate = server_rate, arrival_rate = arrival_rate,
         conflevel = conflevel)
     } else {
@@ -188,9 +180,9 @@ inverse_bound <- function(n, std_dev, hurst,
   backlog <- backlog - difference
   # Bisect $splits times
   while (its < splits) {
-    if (estimate_traffic) {
+    if (estimated_h) {
       probbound <- stat_backlog_bound(
-        flow_increments = traffic, n = n, x = backlog, std_dev = std_dev,
+        n = n, x = backlog, std_dev = std_dev, hurst = hurst,
         server_rate = server_rate, arrival_rate = arrival_rate,
         conflevel = conflevel)
     } else {

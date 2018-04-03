@@ -61,14 +61,19 @@ plot_and_bound <- function(
     n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel,
-    traffic = NaN, estimate_traffic = FALSE)
+    estimated_h = FALSE)
+  
   f <- build_flow(
     arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
+  
+  h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
+  
+  print(paste0("h_up =", h_up))
+  
   stat <- inverse_bound(
-    n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
+    n = n, std_dev = std_dev, hurst = h_up, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel,
-    traffic = f, estimate_traffic = TRUE)
+    conflevel = conflevel, estimated_h = TRUE)
   plot_distribution(d, stat, bound)
 
   #theme_set(theme_bw(base_size = 18))
