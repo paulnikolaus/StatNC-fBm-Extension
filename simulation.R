@@ -13,10 +13,11 @@ source("Bound.R") # inverse_bound()
 # Build a fBm flow following the Kelly model.
 # First a cumulative FBM flow is built and then divided into FGN increments
 # which are easier to use in the SNC setting
-# rate = constant arrival rate, n = point in time until
-# which the traffic shall be generated, std_dev = standard_deviation.
+# rate = constant arrival rate
+# L = Length: point in time until which the traffic shall be generated
+# std_dev = standard_deviation.
 
-build_flow <- function(arrival_rate, hurst, n, std_dev = 1.0) {
+build_flow <- function(arrival_rate, hurst, L, std_dev = 1.0) {
   # Previously:
   # cumuflow <- rep(NA, n)
   # flow <- rep(NA, n)
@@ -36,14 +37,14 @@ build_flow <- function(arrival_rate, hurst, n, std_dev = 1.0) {
   # changed fbm to fbm * (n ** hurst) as the package documentations
   # says that fbm is otherwise only created in the interval
   # 0, ..., (n - 1) / n
-  fbm <- circFBM(n = n, H = hurst, plotfBm = FALSE) * (n ** hurst)
+  fbm <- circFBM(n = L, H = hurst, plotfBm = FALSE) * (L ** hurst)
 
   # work_around to avoid completely negative traffic
   # while (mean(fbm) < 0) {
   #   fbm <- circFBM(n, hurst, plotfBm = FALSE)
   # }
 
-  cumuflow <- arrival_rate * (1:n) + std_dev * fbm
+  cumuflow <- arrival_rate * (1:L) + std_dev * fbm
   cumuflow_shift <- c(0, cumuflow[-length(cumuflow)])
 
   flow_increments <- cumuflow - cumuflow_shift
@@ -79,12 +80,12 @@ simulate_system <- function(flow_increments, server_rate, n) {
 # for FGN arrivals with mean arrival rate, Hurst parameter hurst and
 # standard deviation std_dev at a server with the given server rate
 
-compute_distribution <- function(arrival_rate, hurst, n, server_rate,
+compute_distribution <- function(arrival_rate, hurst, L, n, server_rate,
                                  std_dev = 1.0, iterations = 10 ** 3) {
   backlogs <- rep(NA, iterations)
 
   for (i in 1:iterations) {
-    flow <- build_flow(arrival_rate = arrival_rate, hurst = hurst, n = n,
+    flow <- build_flow(arrival_rate = arrival_rate, hurst = hurst, L = L,
                        std_dev = std_dev)
     b <- 0
     for (k in 1:n) {
@@ -108,11 +109,11 @@ CI = function(data, conf.level = 0.95) {
 }
 
 # Compute a confidence interval for the estimation of H
-confint_h_up <- function(arrival_rate, hurst, std_dev, conflevel, iterations, confint.conflevel) {
+confint_h_up <- function(L, arrival_rate, hurst, std_dev, conflevel, iterations, confint.conflevel) {
   hurst_estimates = rep(NA, iterations)
   for (i in 1:iterations) {
     f <- build_flow(
-      arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
+      arrival_rate = arrival_rate, hurst = hurst, L = L, std_dev = std_dev)
     hurst_estimates[i] <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
   }
   ci = CI(hurst_estimates, conf.level = confint.conflevel)

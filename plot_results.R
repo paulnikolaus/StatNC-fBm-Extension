@@ -56,23 +56,23 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper, trad,
 # the corresponding traditional bound
 
 plot_and_bound <- function(
-  arrival_rate, hurst, n, server_rate, std_dev = 1.0, splits = 20,
+  L, arrival_rate, hurst, n, server_rate, std_dev = 1.0, splits = 20,
   conflevel = 0.995, iterations = 10 ** 2) {
   d <- compute_distribution(
-    arrival_rate = arrival_rate, hurst = hurst, n = n,
+    arrival_rate = arrival_rate, hurst = hurst, L = L, n = n,
     server_rate = server_rate, std_dev = std_dev, iterations = iterations)
   bound <- inverse_bound(
     n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = FALSE)
   
-  f <- build_flow(
-    arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
+
   
-  h.confint <- confint_h_up(arrival_rate = arrival_rate, hurst = hurst, 
+  h.confint <- confint_h_up(L = L, arrival_rate = arrival_rate, hurst = hurst, 
                             std_dev = std_dev, conflevel = conflevel, 
                             iterations=10, confint.conflevel=0.95)
-  
+  #f <- build_flow(
+  #  arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
   #h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
   #print(paste0("h_up =", h_up))
   
@@ -98,6 +98,7 @@ plot_and_bound <- function(
 }
 
 print(plot_and_bound(
+  L = 2 * 10 **2,
   arrival_rate = 10 ** (-3), hurst = 0.7, n = 2 * 10 ** 2,
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 3 - 1))
