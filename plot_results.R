@@ -1,6 +1,8 @@
 ##### plot_results.R #####
 # File to visualize the results
 
+source("simulation.R") # compute_distribution()
+
 # Plots the empirical backlog distribution.
 
 plot_distribution <- function(computed_dist, stat, trad, gran = 1000) {
@@ -68,7 +70,7 @@ plot_and_bound <- function(
     conflevel = conflevel,
     traffic = f, estimate_traffic = TRUE)
   plot_distribution(d, stat, bound)
-  
+
   #theme_set(theme_bw(base_size = 18))
   #qplot(x=1:length(d), y=d) + geom_line(aes(y=bound, colour="bound"))
   #return(list("SNC" = bound, "distribution" = d))
@@ -78,3 +80,7 @@ print(plot_and_bound(
   arrival_rate = 10 ** (-3), hurst = 0.7, n = 2*10 ** 2,
   server_rate = 5*10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 3 - 1))
+
+# results:
+# blue line (SNC-bound?): 178.4
+# yellow line (StatNC-bound?): 617.4
