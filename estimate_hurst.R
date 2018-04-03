@@ -59,7 +59,7 @@ conf_level_hurst <- function(amount_increments, h_estimated,
   V <- 2 * D  **  (-1)
   alpha <- 1 - conflevel
   interval <- qnorm(1 - alpha) * sqrt(V / N)
-  H_up <- max(h_estimated + interval, 1.0)
+  H_up <- min(h_estimated + interval, 1.0)
 
   return(H_up)
 }
@@ -78,6 +78,7 @@ flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
   h_up <- conf_level_hurst(amount_increments = N, h_estimated = h_estimated,
                            conflevel = conflevel)
   #print(paste0("h_up = ", h_up))
+  return(h_up)
 }
 
 
