@@ -7,7 +7,7 @@ source("Bound.R") # for inverse_bound()
 
 # Plots the empirical backlog distribution.
 
-plot_distribution <- function(computed_dist, stat, trad, gran = 1000) {
+plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper, trad, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
   maximum <- max(computed_dist)
@@ -41,6 +41,8 @@ plot_distribution <- function(computed_dist, stat, trad, gran = 1000) {
     geom_vline(xintercept = c(nnb)) +
     geom_vline(xintercept = c(trad), colour = "#56B4E9") +
     geom_vline(xintercept = c(stat), colour = "#E69F00") +
+    geom_vline(xintercept = c(stat_lower), colour = "#E69F00", linetype="dotted") +
+    geom_vline(xintercept = c(stat_upper), colour = "#E69F00", linetype="dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
@@ -67,16 +69,28 @@ plot_and_bound <- function(
   f <- build_flow(
     arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)
 
-  h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
-                       conflevel = conflevel)
+  h.confint <- confint_h_up(arrival_rate = arrival_rate, hurst = hurst,
+                            std_dev = std_dev, conflevel = conflevel,
+                            iterations=10, confint.conflevel=0.95)
 
-  print(paste0("h_up =", h_up))
+  #h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev, conflevel = conflevel)
+  #print(paste0("h_up =", h_up))
 
-  stat <- inverse_bound(
-    n = n, std_dev = std_dev, hurst = h_up, arrival_rate = arrival_rate,
+  stat_mean <- inverse_bound(
+    n = n, std_dev = std_dev, hurst = h.confint[1], arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
-  plot_distribution(d, stat, bound)
+  stat_lower <- inverse_bound(
+    n = n, std_dev = std_dev, hurst = h.confint[2], arrival_rate = arrival_rate,
+    server_rate = server_rate, p = 1 / iterations, splits = splits,
+    conflevel = conflevel, estimated_h = TRUE)
+  stat_upper <- inverse_bound(
+    n = n, std_dev = std_dev, hurst = h.confint[3], arrival_rate = arrival_rate,
+    server_rate = server_rate, p = 1 / iterations, splits = splits,
+    conflevel = conflevel, estimated_h = TRUE)
+
+  plot_distribution(computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
+                    stat_upper = stat_upper, trad = bound)
 
   #theme_set(theme_bw(base_size = 18))
   #qplot(x=1:length(d), y=d) + geom_line(aes(y=bound, colour="bound"))
