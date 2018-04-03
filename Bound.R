@@ -102,14 +102,13 @@ stat_backlog_bound <- function(n, x, std_dev, hurst, server_rate,
     stop("The server rate has to be greater than the arrival rate")
   }
 
-  # TODO: find a more suitable name than "backlog_prob"
-  backlog_prob <- (1 - conflevel) + backlog_bound(
+  backlog_stat <- (1 - conflevel) + backlog_bound(
     n = n, x = x, std_dev = std_dev, hurst = hurst,
     server_rate = server_rate, arrival_rate = arrival_rate)
 
-  # print(paste0("x = ", x, ", backlog_prob = ", backlog_prob))
+  # print(paste0("x = ", x, ", backlog_stat = ", backlog_stat))
 
-  return(backlog_prob)
+  return(backlog_stat)
 }
 
 
