@@ -71,14 +71,15 @@ plot_and_bound <- function(
     conflevel = conflevel, estimated_h = FALSE)
 
 
-  h.confint <- confint_h_up(
+  h.confint <- confint_of_h_up(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = 10,
     confint.conflevel = 0.95)
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
-  print(paste0("Hurst_mean = ", h.confint[1], "Lower = ", h.confint[2],
-               "Upper = ", h.confint[3]))
+  print(paste0("Hurst_up_mean = ", h.confint[1],
+               ", Hurst_up_lower = ", h.confint[2],
+               ", Hurst_up_upper = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
     n = n, std_dev = std_dev, hurst = h.confint[1], arrival_rate = arrival_rate,
@@ -113,7 +114,7 @@ q <- plot_and_bound(
 print(q)
 
 # results:
-# blue line (SNC-bound?): 178.4
-# yellow line (StatNC-bound?): 617.4
+# blue line (SNC-bound?): 178.5
+# yellow line (StatNC-bound?): 540.8
 
 # dev.off()

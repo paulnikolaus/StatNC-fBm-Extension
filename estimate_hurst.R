@@ -96,6 +96,7 @@ flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
 
 
 # Helper function to calculate confidence intervals
+# of upper confidence interval
 ci_help <- function(data, conf.level = 0.95) {
   # Check if all data entries are equal -> No confidence interval
   if (all(data == data[1])) {
@@ -108,9 +109,9 @@ ci_help <- function(data, conf.level = 0.95) {
 
 
 # Compute a confidence interval for the estimation of H
-# TODO: conflevel and confint.conflevel? What is the purpose of this?
-# TODO: rename this function (too similar to conf_level_hurst)
-confint_h_up <- function(
+# conflevel: confidence level of hurst estimation
+# confint.conflevel: confidence level for upper hurst confidence level
+confint_of_h_up <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
   confint.conflevel) {
   hurst_estimates <- rep(NA, iterations)
@@ -127,9 +128,9 @@ confint_h_up <- function(
   return(append(m, ci))
 }
 
-print(confint_h_up(sample_length = 2 ** 12, arrival_rate = 1.0,
-                   hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
-                   iterations = 10 ** 2, confint.conflevel = 0.999))
+# print(confint_of_h_up(sample_length = 2 ** 12, arrival_rate = 1.0,
+#                       hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
+#                       iterations = 10 ** 2, confint.conflevel = 0.999))
 
 
 use_only_first_part <- function(input_vector, share) {
