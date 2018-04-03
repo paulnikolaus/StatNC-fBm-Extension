@@ -2,6 +2,8 @@
 # File to visualize the results
 
 source("simulation.R") # compute_distribution(), loads bound.R
+source("estimate_hurst.R") # loads the necessary tools for estimation
+source("Bound.R") # for inverse_bound()
 
 # Plots the empirical backlog distribution.
 
@@ -60,8 +62,7 @@ plot_and_bound <- function(
   bound <- inverse_bound(
     n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel,
-    estimated_h = FALSE)
+    conflevel = conflevel, estimated_h = FALSE)
   
   f <- build_flow(
     arrival_rate = arrival_rate, hurst = hurst, n = 2 ** 10, std_dev = std_dev)

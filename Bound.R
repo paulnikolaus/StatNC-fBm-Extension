@@ -129,14 +129,11 @@ stat_backlog_bound <- function(n, x, std_dev, hurst, server_rate,
 # arrival_rate = constant rate from the arrival model, also denoted \lambda
 # splits = number of iterations for binary search
 # conflevel = confidence level if estimation was used
-# traffic = input arrival traffic (only necessary for statnc bound)
+
 inverse_bound <- function(n, std_dev, hurst,
                           arrival_rate, server_rate, p = 10  **  (-3),
-                          splits = 10, conflevel = 0.95, traffic = NaN,
+                          splits = 10, conflevel = 0.95,
                           estimated_h = FALSE) {
-  if (estimated_h && is.nan(estimated_h)) {
-    stop("We need some traffic to estimate")
-  }
 
   if (estimated_h && p < (1 - conflevel)) {
     print(paste0("p = ", p, " 1 - conflevel = ", 1 - conflevel))
