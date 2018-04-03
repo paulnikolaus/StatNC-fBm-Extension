@@ -17,10 +17,10 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
    # fbm_traffic <- cumsum(fgn_traffic)
    # Rose: "For FGN and FARIMA...", i.e., we don't use FBM
 
-  log_frequency <- log(spec.pgram(fgn_traffic)$freq)
+  log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
   log_frequency_short <- use_only_first_part(log_frequency, 0.1)
 
-  log_periodogram <- log(spec.pgram(fgn_traffic)$spec)
+  log_periodogram <- log(spec.pgram(fgn_traffic, plot = FALSE)$spec)
   log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
 
   fitted <- lm(log_periodogram_short~log_frequency_short)
@@ -31,8 +31,8 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   h_estimated <- (1 - slope) / 2
 
   if (h_estimated >= 1 || h_estimated <= 0.5) {
-    print("h_estimated")
-    print(h_estimated)
+    # print("h_estimated")
+    # print(h_estimated)
     warning("h_estimated must be in (0.5, 1)")
   }
 
@@ -127,9 +127,28 @@ confint_of_h_up <- function(
   return(append(m, ci))
 }
 
-# print(confint_of_h_up(sample_length = 2 ** 12, arrival_rate = 1.0,
-#                       hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
-#                       iterations = 10 ** 2, confint.conflevel = 0.999))
+mean_of_h_up <- function(
+  sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
+  hurst_up_estimates <- rep(NA, iterations)
+  for (i in 1:iterations) {
+    f <- build_flow(
+      arrival_rate = arrival_rate, hurst = hurst,
+      sample_length = sample_length, std_dev = std_dev)
+    hurst_up_estimates[i] <- flow_to_h_up(
+      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
+      conflevel = conflevel)
+  }
+  
+  return(mean(hurst_up_estimates))
+}
+
+# print(mean_of_h_up(
+#   sample_length = 2 ** 10, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 10 ** 2))
+# 
+# print(confint_of_h_up(
+#   sample_length = 2 ** 10, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 10 ** 2, confint.conflevel = 0.999))
 
 
 use_only_first_part <- function(input_vector, share) {

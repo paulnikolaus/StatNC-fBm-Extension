@@ -69,11 +69,11 @@ plot_and_bound <- function(
     n = n, std_dev = std_dev, hurst = hurst, arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = FALSE)
-
+  
 
   h.confint <- confint_of_h_up(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-    std_dev = std_dev, conflevel = conflevel, iterations = 10,
+    std_dev = std_dev, conflevel = conflevel, iterations = iterations,
     confint.conflevel = 0.95)
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
