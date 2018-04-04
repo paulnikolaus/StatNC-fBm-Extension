@@ -98,8 +98,8 @@ q <- plot_and_bound(
 print(q)
 
 # results:
-# Hurst_up_mean = 0.742350047036596
+# Hurst_up_mean = 0.756453157462797
 # blue line (SNC-bound): 157.6
-# yellow line (StatNC-bound): 198.1
+# yellow line (StatNC-bound): 213.3
 
 # dev.off()

@@ -39,7 +39,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   # h_estimated <- (1 - slope) / 2
 
 
-  h_estimated <- aggvarFit(x = fgn_traffic)@hurst$"H"
+  h_estimated <- perFit(x = fgn_traffic)@hurst$"H"
 
   # use str(class) to see all possibilities to obtain values of
   #  an S4 class
@@ -53,10 +53,10 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   return(h_estimated)
 }
 
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 14, std_dev = 1.0)
-# print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
-#                      std_dev = 1.0))
+flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+                           sample_length = 2 ** 14, std_dev = 1.0)
+print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
+                     std_dev = 1.0))
 
 
 # Gives the confidence interval for the Hurst estimator
