@@ -1,11 +1,20 @@
 ##### estimate_hurst.R #####
+library("fArma")
+
 source("BeranWhittle.R")
+source("simulation.R")
 
 # Estimates the Hurst parameter of the given traffic
 # (we assume Kelly's traffic model)
 # with periodograms
-# TODO: Rose: In most cases, this will lead to a wrong estimate of H
+# Rose: In most cases, this (i.e., periodogram based estimator)
+# will lead to a wrong estimate of H
 # -> better to use other estimator
+
+# Helper function for periodogram based estimation
+# use_only_first_part <- function(input_vector, share) {
+#   return(input_vector[1:(round(length(input_vector) * share))])
+# }
 
 # flow_increments = flow_increments
 # arrival_rate = constant rate of the flow, also denoted \lambda
@@ -14,21 +23,26 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
    # Extract the gaussian noise from flow increments
    fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
-   # fbm_traffic <- cumsum(fgn_traffic)
-   # Rose: "For FGN and FARIMA...", i.e., we don't use FBM
+  # old, self-written, periodogram approach
 
-  log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
-  log_frequency_short <- use_only_first_part(log_frequency, 0.1)
+  # log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
+  # log_frequency_short <- use_only_first_part(log_frequency, 0.1)
+  #
+  # log_periodogram <- log(spec.pgram(fgn_traffic, plot = FALSE)$spec)
+  # log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
+  #
+  # fitted <- lm(log_periodogram_short~log_frequency_short)
+  # # y_value <- fitted$coefficients[1]
+  # slope <- fitted$coefficients[2]
+  #
+  # # print(slope)
+  # h_estimated <- (1 - slope) / 2
 
-  log_periodogram <- log(spec.pgram(fgn_traffic, plot = FALSE)$spec)
-  log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
 
-  fitted <- lm(log_periodogram_short~log_frequency_short)
-  # y_value <- fitted$coefficients[1]
-  slope <- fitted$coefficients[2]
+  h_estimated <- aggvarFit(x = fgn_traffic)@hurst$"H"
 
-  # print(slope)
-  h_estimated <- (1 - slope) / 2
+  # use str(class) to see all possibilities to obtain values of
+  #  an S4 class
 
   if (h_estimated >= 1 || h_estimated <= 0.5) {
     # print("h_estimated")
@@ -40,7 +54,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 12, std_dev = 1.0)
+#                            sample_length = 2 ** 14, std_dev = 1.0)
 # print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
 #                      std_dev = 1.0))
 
@@ -145,7 +159,7 @@ mean_of_h_up <- function(
   #     flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
   #     conflevel = conflevel)
   # }
-  
+
   build_flow_iter <- function(
     iter, arrival_rate = arrival_rate, hurst = hurst,
     sample_length = sample_length, std_dev = std_dev) {
@@ -153,24 +167,19 @@ mean_of_h_up <- function(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev))
   }
-  
+
   flow_matrix <- sapply(1:iterations, build_flow_iter,
                         arrival_rate = arrival_rate, hurst = hurst,
                         sample_length = sample_length, std_dev = std_dev)
   # dim(flowmatrix) = sample_length  iterations
-  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up, 
+  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up,
                               arrival_rate = arrival_rate, std_dev = std_dev,
                               conflevel = conflevel)
-  
-  
+
+
   return(mean(hurst_up_estimates))
 }
 
 # print(mean_of_h_up(
 #   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
 #   conflevel = 0.999, iterations = 10 ** 2))
-
-
-use_only_first_part <- function(input_vector, share) {
-  return(input_vector[1:(round(length(input_vector) * share))])
-}
