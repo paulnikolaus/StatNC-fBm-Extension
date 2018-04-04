@@ -89,8 +89,8 @@ plot_and_bound <- function(
 }
 
 q <- plot_and_bound(
-  sample_length = 2 ** 12,
-  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * 10 ** 2,
+  sample_length = 2 ** 16,
+  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * (10 ** 2),
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
   iterations = 10 ** 2 - 1)
 # pdf("backlog_distribution.pdf", width = 8, height = 5)
@@ -98,7 +98,8 @@ q <- plot_and_bound(
 print(q)
 
 # results:
+# Hurst_up_mean = 0.728819595280559
 # blue line (SNC-bound): 157.6
-# yellow line (StatNC-bound): 260.9
+# yellow line (StatNC-bound): 184.5
 
 # dev.off()

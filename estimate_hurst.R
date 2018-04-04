@@ -126,29 +126,49 @@ confint_of_h_up <- function(
   m <- mean(hurst_up_estimates)
   return(append(m, ci))
 }
+# print(confint_of_h_up(
+#   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 10 ** 2, confint.conflevel = 0.999))
+
+
+# Compute mean of the confidence interval's upper value
 
 mean_of_h_up <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
-  hurst_up_estimates <- rep(NA, iterations)
-  for (i in 1:iterations) {
-    f <- build_flow(
+  # old version with for-loop:
+  # hurst_up_estimates <- rep(NA, iterations)
+  # for (i in 1:iterations) {
+  #   f <- build_flow(
+  #     arrival_rate = arrival_rate, hurst = hurst,
+  #     sample_length = sample_length, std_dev = std_dev)
+  #   hurst_up_estimates[i] <- flow_to_h_up(
+  #     flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
+  #     conflevel = conflevel)
+  # }
+  
+  build_flow_iter <- function(
+    iter, arrival_rate = arrival_rate, hurst = hurst,
+    sample_length = sample_length, std_dev = std_dev) {
+    return(build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
-      sample_length = sample_length, std_dev = std_dev)
-    hurst_up_estimates[i] <- flow_to_h_up(
-      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-      conflevel = conflevel)
+      sample_length = sample_length, std_dev = std_dev))
   }
+  
+  flow_matrix <- sapply(1:iterations, build_flow_iter,
+                        arrival_rate = arrival_rate, hurst = hurst,
+                        sample_length = sample_length, std_dev = std_dev)
+  # dim(flowmatrix) = sample_length  iterations
+  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up, 
+                              arrival_rate = arrival_rate, std_dev = std_dev,
+                              conflevel = conflevel)
+  
   
   return(mean(hurst_up_estimates))
 }
 
 # print(mean_of_h_up(
-#   sample_length = 2 ** 10, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
 #   conflevel = 0.999, iterations = 10 ** 2))
-# 
-# print(confint_of_h_up(
-#   sample_length = 2 ** 10, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
-#   conflevel = 0.999, iterations = 10 ** 2, confint.conflevel = 0.999))
 
 
 use_only_first_part <- function(input_vector, share) {
