@@ -51,7 +51,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # h_estimated = estimated value of h
 # conflevel = confidence level of the estimation
 
-conf_level_hurst <- function(amount_increments, h_estimated,
+get_h_up <- function(amount_increments, h_estimated,
                              conflevel = 0.95) {
   N <- amount_increments
 
@@ -72,7 +72,7 @@ conf_level_hurst <- function(amount_increments, h_estimated,
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # amount_increments <- length(flow_example)
-# print(conf_level_hurst(amount_increments = amount_increments,
+# print(get_h_up(amount_increments = amount_increments,
 #                        h_estimated = 0.7, conflevel = 0.95))
 
 
@@ -87,8 +87,8 @@ flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
   h_estimated <- estimate_hurst(
     flow_increments = flow_increments, arrival_rate = arrival_rate,
     std_dev = std_dev)
-  h_up <- conf_level_hurst(amount_increments = amount_increments,
-                           h_estimated = h_estimated, conflevel = conflevel)
+  h_up <- get_h_up(amount_increments = amount_increments,
+                   h_estimated = h_estimated, conflevel = conflevel)
   # print(paste0("h_up = ", h_up))
   return(h_up)
 }

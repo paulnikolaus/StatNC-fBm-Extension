@@ -7,8 +7,7 @@ source("Bound.R") # for inverse_bound()
 
 # Plots the empirical backlog distribution.
 
-plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
-                              trad, gran = 1000) {
+plot_distribution <- function(computed_dist, stat, trad, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
   maximum <- max(computed_dist)
@@ -42,10 +41,6 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
     geom_vline(xintercept = c(nnb)) +
     geom_vline(xintercept = c(trad), colour = "#56B4E9") +
     geom_vline(xintercept = c(stat), colour = "#E69F00") +
-    geom_vline(xintercept = c(stat_lower), colour = "#E69F00",
-               linetype = "dotted") +
-    geom_vline(xintercept = c(stat_upper), colour = "#E69F00",
-               linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
@@ -65,41 +60,27 @@ plot_and_bound <- function(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
     iterations = iterations)
+
   bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
     splits = splits, conflevel = conflevel, estimated_h = FALSE)
 
-
-  h.confint <- confint_of_h_up(
+  h_up_mean <- mean_of_h_up(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-    std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-    confint.conflevel = 0.95)
+    std_dev = std_dev, conflevel = conflevel, iterations = iterations)
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
-  print(paste0("Hurst_up_mean = ", h.confint[1],
-               ", Hurst_up_lower = ", h.confint[2],
-               ", Hurst_up_upper = ", h.confint[3]))
+  print(paste0("Hurst_up_mean = ", h_up_mean))
 
   stat_mean <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[1],
-    arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE)
-  stat_lower <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[2],
-    arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE)
-  stat_upper <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[3],
+    time_n = time_n, std_dev = std_dev, hurst = h_up_mean,
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
 
   plot_distribution(
-    computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
-    stat_upper = stat_upper, trad = bound)
+    computed_dist = d, stat = stat_mean, trad = bound)
 
   # theme_set(theme_bw(base_size = 18))
   # qplot(x = 1:length(d), y = d) +
@@ -108,16 +89,16 @@ plot_and_bound <- function(
 }
 
 q <- plot_and_bound(
-  sample_length = 2 ** 10,
+  sample_length = 2 ** 12,
   arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * 10 ** 2,
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 10 ** 3 - 1)
+  iterations = 10 ** 2 - 1)
 # pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(q)
 
 # results:
-# blue line (SNC-bound): 178.5
-# yellow line (StatNC-bound): 540.8
+# blue line (SNC-bound): 157.6
+# yellow line (StatNC-bound): 260.9
 
 # dev.off()
