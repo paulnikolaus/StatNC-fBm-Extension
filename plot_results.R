@@ -75,11 +75,13 @@ plot_and_bound <- function(
   #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
   #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
   #   confint.conflevel = 0.95)
+
+  # h_estimated, h_up, h_up^beta from interval_h_up_alter()
   h.confint <- interval_h_up_alter(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations,
     conflevel_beta = 0.99999)
-  
+
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
   # print(paste0("Hurst_up_mean = ", h.confint[1],
@@ -87,7 +89,7 @@ plot_and_bound <- function(
   #              ", Hurst_up_upper = ", h.confint[3]))
   print(paste0("Hurst_mean = ", h.confint[1],
                ", Hurst_up_mean = ", h.confint[2],
-               ", Hurst_up_upper = ", h.confint[3]))
+               ", Hurst_up_beta = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint[2],

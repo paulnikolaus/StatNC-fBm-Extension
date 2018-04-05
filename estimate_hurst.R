@@ -64,7 +64,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # amount_increments = length of the fbm_traffic vector
 # h_estimated = estimated value of h
 # conflevel = confidence level of the estimation
-
+# return: lower and upper confidence interval as a vector
 h_confint <- function(sample_length, h_estimated,
                       conflevel = 0.95) {
   N <- sample_length
@@ -95,7 +95,7 @@ h_confint <- function(sample_length, h_estimated,
 # flow_increments = output of build_flow()
 # arrival_rate = arrival_rate used in the traffic model
 # std_dev = std_dev of flow
-
+# return: lower CI, estimated value, and upper CI as a vector
 flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
                               conflevel) {
   sample_length <- length(flow_increments)
@@ -154,7 +154,6 @@ confint_of_h_up <- function(
 
 
 # Compute mean of the confidence interval's upper value
-
 mean_of_h_up <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
   # old version with for-loop:
@@ -194,9 +193,17 @@ mean_of_h_up <- function(
 #   conflevel = 0.999, iterations = 10 ** 2))
 
 
+# Compute an alternative interval for h_p
+# conflevel: confidence level of hurst estimation
+# conflevel_beta: compute another h_up for a higher confidence level
 interval_h_up_alter <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
   conflevel_beta) {
+
+  if (conflevel_beta < conflevel) {
+    stop("the beta confidence level must be higher than the normal one")
+  }
+
   hurst_intervals <- matrix(rep(NA, 3 * iterations),
                             nrow = iterations, ncol = 3)
   hurst_intervals_beta <- matrix(rep(NA, 3 * iterations),
@@ -216,6 +223,7 @@ interval_h_up_alter <- function(
   hurst_int_means <- apply(hurst_intervals, 2, mean)
   hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
 
+  # h_estimated, h_up, h_up^beta
   return(c(hurst_int_means[2], hurst_int_means[3], hurst_int_beta_means[3]))
 }
 
