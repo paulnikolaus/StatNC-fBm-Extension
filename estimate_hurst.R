@@ -105,7 +105,7 @@ flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
   h_conf <- h_confint(sample_length = sample_length,
                       h_estimated = h_estimated, conflevel = conflevel)
 
-  # h_low, h_estimated, h_up
+  # c(h_low, h_estimated, h_up)
   return(c(h_conf[1], h_estimated, h_conf[2]))
 }
 
@@ -223,7 +223,7 @@ interval_h_up_alter <- function(
   hurst_int_means <- apply(hurst_intervals, 2, mean)
   hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
 
-  # h_estimated, h_up, h_up^beta
+  # c(h_estimated, h_up, h_up^beta)
   return(c(hurst_int_means[2], hurst_int_means[3], hurst_int_beta_means[3]))
 }
 

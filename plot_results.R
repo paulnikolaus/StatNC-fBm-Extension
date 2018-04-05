@@ -76,7 +76,7 @@ plot_and_bound <- function(
   #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
   #   confint.conflevel = 0.95)
 
-  # h_estimated, h_up, h_up^beta from interval_h_up_alter()
+  # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
   h.confint <- interval_h_up_alter(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations,
