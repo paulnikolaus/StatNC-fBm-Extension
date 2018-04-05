@@ -169,32 +169,27 @@ mean_of_h_up <- function(
   #     conflevel = conflevel)[3]
   # }
 
-  build_flow_iter <- function(
-    iter, arrival_rate = arrival_rate, hurst = hurst,
-    sample_length = sample_length, std_dev = std_dev) {
+  # added input parameter in order to use sapply()
+  build_flow_iter <- function(iter) {
     return(build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev))
   }
 
-  flow_to_h_up <- function(flow_increments, arrival_rate, std_dev, conflevel) {
+  flow_to_h_up <- function(flow_increments) {
     return(flow_to_h_confint(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
       std_dev = std_dev, conflevel = conflevel))[3]
   }
 
-  flow_matrix <- sapply(1:iterations, build_flow_iter,
-                        arrival_rate = arrival_rate, hurst = hurst,
-                        sample_length = sample_length, std_dev = std_dev)
+  flow_matrix <- sapply(1:iterations, build_flow_iter)
   # dim(flowmatrix) = sample_length  iterations
-  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up,
-                              arrival_rate = arrival_rate, std_dev = std_dev,
-                              conflevel = conflevel)
+  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up)
 
 
   return(mean(hurst_up_estimates))
 }
 
-print(mean_of_h_up(
-  sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
-  conflevel = 0.999, iterations = 10 ** 2))
+# print(mean_of_h_up(
+#   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 10 ** 2))
