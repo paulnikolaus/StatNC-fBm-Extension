@@ -65,9 +65,9 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # h_estimated = estimated value of h
 # conflevel = confidence level of the estimation
 
-h_confint <- function(amount_increments, h_estimated,
+h_confint <- function(sample_length, h_estimated,
                       conflevel = 0.95) {
-  N <- amount_increments
+  N <- sample_length
 
   D <- CetaFGN(eta = c(H = h_estimated))
   V <- 2 * D  **  (-1)
@@ -86,27 +86,27 @@ h_confint <- function(amount_increments, h_estimated,
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
-# amount_increments <- length(flow_example)
-# print(h_confint(amount_increments = amount_increments,
+# sample_length <- length(flow_example)
+# print(h_confint(sample_length = sample_length,
 #                 h_estimated = 0.7, conflevel = 0.95))
 
 
-# Convenience function for estimation of h_up
-# flow_increments = FGN Flow
+# Convenience function for estimation of h's confidence interval
+# flow_increments = output of build_flow()
 # arrival_rate = arrival_rate used in the traffic model
 # std_dev = std_dev of flow
 
 flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
                               conflevel) {
-  amount_increments <- length(flow_increments)
+  sample_length <- length(flow_increments)
 
   h_estimated <- estimate_hurst(
     flow_increments = flow_increments, arrival_rate = arrival_rate,
     std_dev = std_dev)
-  h_conf <- h_confint(amount_increments = amount_increments,
+  h_conf <- h_confint(sample_length = sample_length,
                       h_estimated = h_estimated, conflevel = conflevel)
 
-  # print("c(h_low, h_estimated, h_up)")
+  # h_low, h_estimated, h_up
   return(c(h_conf[1], h_estimated, h_conf[2]))
 }
 
