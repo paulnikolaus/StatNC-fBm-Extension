@@ -100,9 +100,8 @@ flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
                               conflevel) {
   sample_length <- length(flow_increments)
 
-  h_estimated <- estimate_hurst(
-    flow_increments = flow_increments, arrival_rate = arrival_rate,
-    std_dev = std_dev)
+  h_estimated <- estimate_hurst(flow_increments = flow_increments,
+                                arrival_rate = arrival_rate, std_dev = std_dev)
   h_conf <- h_confint(sample_length = sample_length,
                       h_estimated = h_estimated, conflevel = conflevel)
 
@@ -112,7 +111,6 @@ flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 14, std_dev = 1.0)
-# amount_increments <- length(flow_example)
 # print(flow_to_h_confint(flow_increments = flow_example, arrival_rate = 1.0,
 #                         std_dev = 1.0, conflevel = 0.99))
 
@@ -147,6 +145,7 @@ confint_of_h_up <- function(
   }
   ci <- ci_help(data = hurst_up_estimates, conf.level = confint.conflevel)
   m <- mean(hurst_up_estimates)
+
   return(append(m, ci))
 }
 # print(confint_of_h_up(
@@ -193,3 +192,33 @@ mean_of_h_up <- function(
 # print(mean_of_h_up(
 #   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
 #   conflevel = 0.999, iterations = 10 ** 2))
+
+
+interval_h_up_alter <- function(
+  sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
+  conflevel_beta) {
+  hurst_intervals <- matrix(rep(NA, 3 * iterations),
+                            nrow = iterations, ncol = 3)
+  hurst_intervals_beta <- matrix(rep(NA, 3 * iterations),
+                                 nrow = iterations, ncol = 3)
+
+  for (i in 1:iterations) {
+    f <- build_flow(
+      arrival_rate = arrival_rate, hurst = hurst,
+      sample_length = sample_length, std_dev = std_dev)
+    hurst_intervals[i, ] <- flow_to_h_confint(
+      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
+      conflevel = conflevel)
+    hurst_intervals_beta[i, ] <- flow_to_h_confint(
+      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
+      conflevel = conflevel_beta)
+  }
+  hurst_int_means <- apply(hurst_intervals, 2, mean)
+  hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
+
+  return(c(hurst_int_means[2], hurst_int_means[3], hurst_int_beta_means[3]))
+}
+
+# print(interval_h_up_alter(
+#   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 10 ** 2, conflevel_beta = 0.99999))

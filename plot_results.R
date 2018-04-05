@@ -71,23 +71,31 @@ plot_and_bound <- function(
     splits = splits, conflevel = conflevel, estimated_h = FALSE)
 
 
-  h.confint <- confint_of_h_up(
+  # h.confint <- confint_of_h_up(
+  #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
+  #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
+  #   confint.conflevel = 0.95)
+  h.confint <- interval_h_up_alter(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-    confint.conflevel = 0.95)
+    conflevel_beta = 0.99999)
+  
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
-  print(paste0("Hurst_up_mean = ", h.confint[1],
-               ", Hurst_up_lower = ", h.confint[2],
+  # print(paste0("Hurst_up_mean = ", h.confint[1],
+  #              ", Hurst_up_lower = ", h.confint[2],
+  #              ", Hurst_up_upper = ", h.confint[3]))
+  print(paste0("Hurst_mean = ", h.confint[1],
+               ", Hurst_up_mean = ", h.confint[2],
                ", Hurst_up_upper = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[1],
+    time_n = time_n, std_dev = std_dev, hurst = h.confint[2],
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   stat_lower <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[2],
+    time_n = time_n, std_dev = std_dev, hurst = h.confint[1],
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
@@ -108,16 +116,17 @@ plot_and_bound <- function(
 }
 
 q <- plot_and_bound(
-  sample_length = 2 ** 10,
-  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * 10 ** 2,
+  sample_length = 2 ** 13,
+  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * (10 ** 2),
   server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 10 ** 3 - 1)
+  iterations = 10 ** 2)
 # pdf("backlog_distribution.pdf", width = 8, height = 5)
 
+pdf("backlog_distribution_alter.pdf", width = 8, height = 5)
 print(q)
 
 # results:
-# blue line (SNC-bound): 178.5
-# yellow line (StatNC-bound): 540.8
+# blue line (SNC-bound): 157.7
+# yellow line (StatNC-bound): 237.9
 
-# dev.off()
+dev.off()
