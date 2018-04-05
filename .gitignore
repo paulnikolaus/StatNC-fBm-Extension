@@ -1,7 +1,10 @@
-*.exe
 *.RData
 *.Rhistory
+
 *.pdf
-.vscode/
+*.png
+*.jpg
 
 .DS_Store
+.vscode/
+*.exe
