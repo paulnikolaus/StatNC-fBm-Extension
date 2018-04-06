@@ -1,4 +1,4 @@
-##### estimate_comparison.R #####
+##### hurst_estimates.R #####
 
 library("fArma")
 library("foreach")
