@@ -25,7 +25,8 @@ get_execution_time <- function(method, hurst, sample_length,
                                iterations = 100) {
   print(method_to_description(method))
   data <- foreach(i = 1:iterations, .combine = 'c') %do% {
-    system.time(fbmSim(n = sample_length, H = hurst, method = method))[3]
+    system.time(fbmSim(n = sample_length, H = hurst, method = method,
+                       doplot = FALSE))[3]
   }
 
   return(paste0("overall time: ", sum(data)))
@@ -36,13 +37,13 @@ sample_length <- 2 ** 10
 iterations <- 100
 
 # mvn is way to slow
-# print(get_execution_time(method = "mvn", hurst = h,
-#                          sample_length = sample_length,
-#                          iterations = iterations))
+print(get_execution_time(method = "mvn", hurst = h,
+                         sample_length = sample_length,
+                         iterations = iterations))
 # chol is also too slow
-# print(get_execution_time(method = "chol", hurst = h,
-#                         sample_length = sample_length,
-#                         iterations = iterations))
+print(get_execution_time(method = "chol", hurst = h,
+                        sample_length = sample_length,
+                        iterations = iterations))
 print(get_execution_time(method = "lev", hurst = h,
                         sample_length = sample_length,
                         iterations = iterations))
@@ -57,12 +58,12 @@ print(get_execution_time(method = "wave", hurst = h,
 # results:
 
 #"Numerical approximation of the stochastic integral"
-#"overall time: 112.201"
+#"overall time: 108.168"
 #"Choleski’s decomposition of the covariance matrix"
-#"overall time: 32.4250000000001"
+#"overall time: 31.163"
 #"Levinson method"
-#"overall time: 7.39599999999984"
+#"overall time: 6.77200000000002"
 #"Wood and Chan method"
-#"overall time: 0.577000000000083"
+#"overall time: 0.164999999999907"
 #"Wavelet synthesis"
-#"overall time: 7.05000000000001"
+#"overall time: 6.31800000000021"
