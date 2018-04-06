@@ -47,4 +47,9 @@ print("steady-state bound:")
 print(backlog_bound_steady(std_dev = sigma, hurst = h, server_rate = C,
                            arrival_rate = lamb))
 
-# and we observe that the steady-state bound is about a 1000 times worse
+#"transient bound:"
+#0.0008727755
+#"steady-state bound:"
+#0.4739116
+
+# We observe that the steady-state bound is about a 1000 times worse
