@@ -32,23 +32,37 @@ get_execution_time <- function(method, hurst, sample_length,
 }
 
 h <- 0.7
-sample_length <- 2 ** 12
+sample_length <- 2 ** 10
 iterations <- 100
 
-print(get_execution_time(method = "mvn", hurst = h,
-                         sample_length = sample_length,
-                         iterations = iterations))
-print(get_execution_time(method = "chol", hurst = h,
-                        sample_length = sample_length,
-                        iterations = iterations))
+# mvn is way to slow
+# print(get_execution_time(method = "mvn", hurst = h,
+#                          sample_length = sample_length,
+#                          iterations = iterations))
+# chol is also too slow
+# print(get_execution_time(method = "chol", hurst = h,
+#                         sample_length = sample_length,
+#                         iterations = iterations))
 print(get_execution_time(method = "lev", hurst = h,
                         sample_length = sample_length,
                         iterations = iterations))
+# circ is by far the fastest method
 print(get_execution_time(method = "circ", hurst = h,
                          sample_length = sample_length,
                          iterations = iterations))
-print(get_execution_time(method = "circ", hurst = h,
+print(get_execution_time(method = "wave", hurst = h,
                         sample_length = sample_length,
                         iterations = iterations))
 
 # results:
+
+#"Numerical approximation of the stochastic integral"
+#"overall time: 112.201"
+#"Choleski’s decomposition of the covariance matrix"
+#"overall time: 32.4250000000001"
+#"Levinson method"
+#"overall time: 7.39599999999984"
+#"Wood and Chan method"
+#"overall time: 0.577000000000083"
+#"Wavelet synthesis"
+#"overall time: 7.05000000000001"
