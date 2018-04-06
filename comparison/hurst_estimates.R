@@ -3,7 +3,7 @@
 library("fArma")
 library("foreach")
 
-source("simulation.R")
+source("../simulation.R")
 
 # Comparison of the hurst estimations in the fArma package
 # Functions are based on
