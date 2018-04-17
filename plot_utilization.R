@@ -10,7 +10,7 @@ source("Bound.R") # inverse_bound()
 
 # Plots the the bound against the utilization.
 
-backlog_vs_util <- function(
+csv_backlog_vs_util <- function(
   sample_length, arrival_rate, hurst, time_n, std_dev = 1.0,
   splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
   utilizations <- (10:19) / 20
@@ -50,15 +50,22 @@ backlog_vs_util <- function(
   }
 
 
-  backlog_bounds_df = as.data.frame(
+  backlog_bounds_df <- as.data.frame(
     cbind(utilizations, stat_mean, bound, simulated_backlog))
 
+  write.csv(backlog_bounds_df, file = "backlog_bounds.csv",
+            row.names = FALSE)
+
+  return(backlog_bounds_df)
+}
+
+plot_backlog_vs_util <- function() {
+  backlog_bounds_df <- read.csv(file = "backlog_bounds.csv")
+  
   colnames(backlog_bounds_df) <- c(
     "utilizations", "Mean of StatNC bounds", "SNC Bound",
     "Quantile of Simulated Backlog")
-
-  # print(backlog_bounds_df)
-
+  
   long_df <- melt(backlog_bounds_df, id = "utilizations",
                   variable.name = "type",
                   value.name = "Backlog_bound")
@@ -82,12 +89,14 @@ backlog_vs_util <- function(
   return(p)
 }
 
+# csv_backlog_vs_util(
+#   sample_length = 2 ** 15,
+#   arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * (10 ** 2),
+#   std_dev = 1.0, splits = 20, conflevel = 0.999,
+#   iterations = 2 * (10 ** 2))
+
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
-backlog_vs_util(
-  sample_length = 2 ** 14,
-  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * (10 ** 2),
-  std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 2 * (10 ** 2))
+plot_backlog_vs_util()
 
 dev.off()
