@@ -89,11 +89,11 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-# csv_backlog_vs_util(
-#   sample_length = 2 ** 15,
-#   arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 2 * (10 ** 2),
-#   std_dev = 1.0, splits = 20, conflevel = 0.999,
-#   iterations = 2 * (10 ** 2))
+csv_backlog_vs_util(
+  sample_length = 2 ** 15,
+  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 100,
+  std_dev = 1.0, splits = 20, conflevel = 0.999,
+  iterations = 300)
 
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
