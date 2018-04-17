@@ -109,9 +109,9 @@ compute_distribution <- function(
 #   iterations = 10 ** 3))
 
 
-.show_progress <- function(it, max_iterations) {
+.show_progress <- function(it, max_iterations, prog_msg = "progess") {
   perc <- round(max_iterations / 10)
   if (it %% perc == 0) {
-    print(paste0(it * 100 / max_iterations, "%"))
+    print(paste0(prog_msg, ": ", it * 100 / max_iterations, "%"))
   }
 }

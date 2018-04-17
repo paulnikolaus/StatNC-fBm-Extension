@@ -145,7 +145,7 @@ confint_of_h_up <- function(
       flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
       conflevel = conflevel)[3]
 
-    .show_progress(i, iterations)
+    .show_progress(i, iterations, prog_msg = "confint_of_h_up()")
   }
   ci <- ci_help(data = hurst_up_estimates, conf.level = confint.conflevel)
   m <- mean(hurst_up_estimates)
@@ -228,7 +228,7 @@ interval_h_up_alter <- function(
     hurst_intervals_beta[i, ] <- flow_to_h_confint_short(
       flow_increments = f, conflevel = conflevel_beta)
     
-    .show_progress(i, iterations)
+    .show_progress(i, iterations, "interval_h_up_alter()")
   }
   hurst_int_means <- apply(hurst_intervals, 2, mean)
   hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
