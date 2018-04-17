@@ -96,8 +96,9 @@ compute_distribution <- function(
       # Lindley's equation:
       b <- max(b + flow[k] - server_rate, 0)
     }
-    .show_progress(i, iterations)
     backlogs[i] <- b
+
+    # .show_progress(i, iterations)
   }
   return(backlogs)
 }
