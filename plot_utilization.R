@@ -61,11 +61,11 @@ csv_backlog_vs_util <- function(
 
 plot_backlog_vs_util <- function() {
   backlog_bounds_df <- read.csv(file = "backlog_bounds.csv")
-  
+
   colnames(backlog_bounds_df) <- c(
     "utilizations", "Mean of StatNC bounds", "SNC Bound",
     "Quantile of Simulated Backlog")
-  
+
   long_df <- melt(backlog_bounds_df, id = "utilizations",
                   variable.name = "type",
                   value.name = "Backlog_bound")
@@ -90,10 +90,10 @@ plot_backlog_vs_util <- function() {
 }
 
 csv_backlog_vs_util(
-  sample_length = 2 ** 15,
-  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 100,
+  sample_length = 2 ** 14,
+  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
   std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 300)
+  iterations = 500)
 
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 

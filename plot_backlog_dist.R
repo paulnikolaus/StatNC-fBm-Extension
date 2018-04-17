@@ -121,15 +121,15 @@ plot_and_bound <- function(
 
 q <- plot_and_bound(
   sample_length = 2 ** 15,
-  arrival_rate = 10 ** (-3), hurst = 0.7, time_n = 200,
-  server_rate = 5 * 10 ** (-3), std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 100)
+  arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
+  server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0, splits = 20,
+  conflevel = 0.999, iterations = 200)
 pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(q)
 
 # results:
-# blue line (SNC-bound): 157.7
-# yellow line (StatNC-bound): 196.2
+# blue line (SNC-bound): 164.0
+# yellow line (StatNC-bound): 204.5
 
 dev.off()
