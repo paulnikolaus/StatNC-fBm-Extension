@@ -1,6 +1,8 @@
 ##### plot_backlog_dist.R #####
 # File to visualize the results
 
+library("ggplot2")
+
 source("simulation.R") # compute_distribution(), loads bound.R
 source("estimate_hurst.R") # loads the necessary tools for estimation
 source("Bound.R") # inverse_bound()
