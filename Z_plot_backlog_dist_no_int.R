@@ -1,9 +1,9 @@
-##### plot_results.R #####
+##### Z_plot_backlog_dist_no_int.R #####
 # File to visualize the results
 
 source("simulation.R") # compute_distribution(), loads bound.R
 source("estimate_hurst.R") # loads the necessary tools for estimation
-source("Bound.R") # for inverse_bound()
+source("Bound.R") # inverse_bound()
 
 # Plots the empirical backlog distribution.
 

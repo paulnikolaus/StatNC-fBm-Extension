@@ -208,17 +208,21 @@ interval_h_up_alter <- function(
                             nrow = iterations, ncol = 3)
   hurst_intervals_beta <- matrix(rep(NA, 3 * iterations),
                                  nrow = iterations, ncol = 3)
+  
+  flow_to_h_confint_short <- function(flow_increments, conflevel) {
+    return(flow_to_h_confint(
+      flow_increments = flow_increments, arrival_rate = arrival_rate,
+      std_dev = std_dev, conflevel = conflevel))
+  }
 
   for (i in 1:iterations) {
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
-    hurst_intervals[i, ] <- flow_to_h_confint(
-      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-      conflevel = conflevel)
-    hurst_intervals_beta[i, ] <- flow_to_h_confint(
-      flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-      conflevel = conflevel_beta)
+    hurst_intervals[i, ] <- flow_to_h_confint_short(
+      flow_increments = f, conflevel = conflevel)
+    hurst_intervals_beta[i, ] <- flow_to_h_confint_short(
+      flow_increments = f, conflevel = conflevel_beta)
   }
   hurst_int_means <- apply(hurst_intervals, 2, mean)
   hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
