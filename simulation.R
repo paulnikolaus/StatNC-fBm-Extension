@@ -98,7 +98,7 @@ compute_distribution <- function(
     }
     backlogs[i] <- b
 
-    # .show_progress(i, iterations)
+    .show_progress(i, iterations, prog_msg = "compute_distribution()")
   }
   return(backlogs)
 }
