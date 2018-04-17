@@ -1,5 +1,7 @@
 ##### estimate_hurst.R #####
 library("fArma")
+# progress bar apply
+library("pbapply")
 
 source("BeranWhittle.R")
 source("simulation.R")
@@ -184,7 +186,7 @@ mean_of_h_up <- function(
 
   flow_matrix <- sapply(1:iterations, build_flow_iter)
   # dim(flowmatrix) = sample_length  iterations
-  hurst_up_estimates <- apply(flow_matrix, 2, flow_to_h_up)
+  hurst_up_estimates <- pbapply(flow_matrix, 2, flow_to_h_up)
 
 
   return(mean(hurst_up_estimates))
@@ -225,7 +227,7 @@ interval_h_up_alter <- function(
       flow_increments = f, conflevel = conflevel)
     hurst_intervals_beta[i, ] <- flow_to_h_confint_short(
       flow_increments = f, conflevel = conflevel_beta)
-
+    
     .show_progress(i, iterations)
   }
   hurst_int_means <- apply(hurst_intervals, 2, mean)
