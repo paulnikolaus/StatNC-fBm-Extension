@@ -1,8 +1,8 @@
 ##### Simulation.R #####
 ## This file holds the necessary functions for the simulation.
 
-# Libraries.
-# For circFbm
+# Libraries:
+# circFbm
 library("dvfBm")
 # Best plots EU
 library("ggplot2")
