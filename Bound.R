@@ -22,7 +22,7 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
-  if ((x - arrival_rate) * tau <= 0) {
+  if (x - arrival_rate * tau <= 0) {
     stop("theta's sign constraint is violated")
   }
 
@@ -77,7 +77,7 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   if (server_rate < arrival_rate) {
     stop("The server rate has to be greater than the arrival rate")
   }
-  if ((x - arrival_rate) * tau <= 0) {
+  if (x - arrival_rate * tau <= 0) {
     stop("theta's sign constraint is violated")
   }
 
