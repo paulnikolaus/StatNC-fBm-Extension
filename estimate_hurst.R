@@ -67,14 +67,16 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # h_estimated = estimated value of h
 # conflevel = confidence level of the estimation
 # return: lower and upper confidence interval as a vector
-h_confint <- function(sample_length, h_estimated,
+estimate_h_up <- function(sample_length, h_estimated,
                       conflevel = 0.95) {
   N <- sample_length
 
   D <- CetaFGN(eta = c(H = h_estimated))
   V <- 2 * D  **  (-1)
   alpha <- 1 - conflevel
-  h_low <- h_estimated - qnorm(1 - alpha) * sqrt(V / N)
+  # we use the one-sided confidence intervall as we are only worried about
+  # underestimation
+  # otherwise we have to use 1 - alpha / 2
   h_up <- h_estimated + qnorm(1 - alpha) * sqrt(V / N)
 
   # confidence interval of hurst must be in (0, 1)
@@ -83,14 +85,14 @@ h_confint <- function(sample_length, h_estimated,
     h_up <- 1.0
   }
 
-  return(c(h_low, h_up))
+  return(h_up)
 }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # sample_length <- length(flow_example)
-# print(h_confint(sample_length = sample_length,
-#                 h_estimated = 0.7, conflevel = 0.95))
+# print(estimate_h_up(sample_length = sample_length,
+#                     h_estimated = 0.7, conflevel = 0.95))
 
 
 # Convenience function for estimation of h's confidence interval
@@ -98,23 +100,22 @@ h_confint <- function(sample_length, h_estimated,
 # arrival_rate = arrival_rate used in the traffic model
 # std_dev = std_dev of flow
 # return: lower CI, estimated value, and upper CI as a vector
-flow_to_h_confint <- function(flow_increments, arrival_rate, std_dev,
-                              conflevel) {
+flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
+                             conflevel) {
   sample_length <- length(flow_increments)
 
   h_estimated <- estimate_hurst(flow_increments = flow_increments,
                                 arrival_rate = arrival_rate, std_dev = std_dev)
-  h_conf <- h_confint(sample_length = sample_length,
-                      h_estimated = h_estimated, conflevel = conflevel)
+  h_up <- estimate_h_up(sample_length = sample_length,
+                        h_estimated = h_estimated, conflevel = conflevel)
 
-  # c(h_low, h_estimated, h_up)
-  return(c(h_conf[1], h_estimated, h_conf[2]))
+  return(list("h_est" = h_estimated, "h_up" = h_up))
 }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 14, std_dev = 1.0)
-# print(flow_to_h_confint(flow_increments = flow_example, arrival_rate = 1.0,
-#                         std_dev = 1.0, conflevel = 0.99))
+# print(flow_to_h_est_up(flow_increments = flow_example, arrival_rate = 1.0,
+#                        std_dev = 1.0, conflevel = 0.99))
 
 
 # Helper function to calculate confidence intervals
@@ -141,9 +142,9 @@ confint_of_h_up <- function(
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
-    hurst_up_estimates[i] <- flow_to_h_confint(
+    hurst_up_estimates[i] <- flow_to_h_est_up(
       flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-      conflevel = conflevel)[3]
+      conflevel = conflevel)$"h_up"
 
     .show_progress(i, iterations, prog_msg = "confint_of_h_up()")
   }
@@ -152,6 +153,7 @@ confint_of_h_up <- function(
 
   return(append(m, ci))
 }
+
 # print(confint_of_h_up(
 #   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
 #   conflevel = 0.999, iterations = 10 ** 2, confint.conflevel = 0.999))
@@ -179,9 +181,9 @@ mean_of_h_up <- function(
   }
 
   flow_to_h_up <- function(flow_increments) {
-    return(flow_to_h_confint(
+    return(flow_to_h_est_up(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
-      std_dev = std_dev, conflevel = conflevel))[3]
+      std_dev = std_dev, conflevel = conflevel)$"h_up")
   }
 
   flow_matrix <- sapply(1:iterations, build_flow_iter)
@@ -200,6 +202,7 @@ mean_of_h_up <- function(
 # Compute an alternative interval for h_p
 # conflevel: confidence level of hurst estimation
 # conflevel_beta: compute another h_up for a higher confidence level
+
 interval_h_up_alter <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
   conflevel_beta) {
@@ -208,13 +211,12 @@ interval_h_up_alter <- function(
     stop("the beta confidence level must be higher than the normal one")
   }
 
-  hurst_intervals <- matrix(rep(NA, 3 * iterations),
-                            nrow = iterations, ncol = 3)
-  hurst_intervals_beta <- matrix(rep(NA, 3 * iterations),
-                                 nrow = iterations, ncol = 3)
+  hurst_est <- rep(NA, iterations)
+  hurst_up <- rep(NA, iterations)
+  hurst_up_beta <- rep(NA, iterations)
 
-  flow_to_h_confint_short <- function(flow_increments, conflevel) {
-    return(flow_to_h_confint(
+  flow_to_h_est_up_short <- function(flow_increments, conflevel) {
+    return(flow_to_h_est_up(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
       std_dev = std_dev, conflevel = conflevel))
   }
@@ -223,20 +225,25 @@ interval_h_up_alter <- function(
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
-    hurst_intervals[i, ] <- flow_to_h_confint_short(
+    est_up <- flow_to_h_est_up_short(
       flow_increments = f, conflevel = conflevel)
-    hurst_intervals_beta[i, ] <- flow_to_h_confint_short(
-      flow_increments = f, conflevel = conflevel_beta)
-    
+    hurst_est[i] <- unlist(est_up)[1]
+    hurst_up[i] <- unlist(est_up)[2]
+    hurst_up_beta[i] <- estimate_h_up(
+      sample_length = sample_length,
+      h_estimated = hurst_est[i], conflevel = conflevel_beta)
+
     .show_progress(i, iterations, "interval_h_up_alter()")
   }
-  hurst_int_means <- apply(hurst_intervals, 2, mean)
-  hurst_int_beta_means <- apply(hurst_intervals_beta, 2, mean)
+  hurst_est_means <- mean(hurst_est)
+  hurst_up_means <- mean(hurst_up)
+  hurst_up_beta_means <- mean(hurst_up_beta)
 
   # c(h_estimated, h_up, h_up^beta)
-  return(c(hurst_int_means[2], hurst_int_means[3], hurst_int_beta_means[3]))
+  return(list("hurst_est" = hurst_est_means, "hurst_up" = hurst_up_means,
+              "hurst_up_beta" = hurst_up_beta_means))
 }
 
 # print(interval_h_up_alter(
-#   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
-#   conflevel = 0.999, iterations = 10 ** 2, conflevel_beta = 0.99999))
+#   sample_length = 2 ** 13, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
+#   conflevel = 0.999, iterations = 100, conflevel_beta = 0.999999))

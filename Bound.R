@@ -23,7 +23,7 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
     stop("server rate has to be greater than the arrival rate")
   }
   if (x - arrival_rate * tau <= 0) {
-    stop("theta's sign constraint is violated")
+    warning("theta's sign constraint is violated")
   }
 
   k <- 1:(floor(time_n / tau) + 1)
@@ -77,9 +77,6 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   if (server_rate < arrival_rate) {
     stop("The server rate has to be greater than the arrival rate")
   }
-  if (x - arrival_rate * tau <= 0) {
-    stop("theta's sign constraint is violated")
-  }
 
   backlog_stat <- (1 - conflevel) + backlog_bound(
     time_n = time_n, x = x, std_dev = std_dev, hurst = hurst,
@@ -90,12 +87,10 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   return(backlog_stat)
 }
 
-
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7, time_n = 2 ** 12,
-#                            std_dev = 1.0)
-# print(stat_backlog_bound(flow_increments = flow_example, time_n = 10, x = 3.0,
-#                          std_dev = 1.0, server_rate = 1.0, arrival_rate = 0.6,
+# print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst = 0.7,
+#                          server_rate = 1.0, arrival_rate = 0.6,
 #                          conflevel = 0.95))
+
 
 # Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
 # last parameter indicates whether SNC or stat_nc bound should be used

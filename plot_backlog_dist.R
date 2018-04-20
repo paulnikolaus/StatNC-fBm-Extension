@@ -94,20 +94,25 @@ plot_and_bound <- function(
                ", Hurst_up_beta = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[2],
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_up",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_mean = ", stat_mean))
+
   stat_lower <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[1],
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_est",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_lower = ", stat_lower))
+
   stat_upper <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint[3],
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_up_beta",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_upper = ", stat_upper))
 
   plot_distribution(
     computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
