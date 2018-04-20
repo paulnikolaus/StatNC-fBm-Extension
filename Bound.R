@@ -26,7 +26,7 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
     stop("theta's sign constraint is violated")
   }
 
-  k <- (floor(1 / tau) + 1):(floor(time_n / tau) + 1)
+  k <- 1:(floor(time_n / tau) + 1)
 
   exponent <- -((x - server_rate * tau + (
     server_rate - arrival_rate) * k * tau) ** 2) / (
