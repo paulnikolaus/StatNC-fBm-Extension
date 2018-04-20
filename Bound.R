@@ -17,14 +17,21 @@ source("simulation.R")
 # tau = discretization parameter > 0
 backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
                           arrival_rate, tau = 0.9) {
+  # TODO: Better default value for tau
+
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
+  if ((x - arrival_rate) * tau <= 0) {
+    stop("theta's sign constraint is violated for k=1")
+  }
 
   k <- (floor(1 / tau) + 1):(floor(time_n / tau) + 1)
+
   exponent <- -((x - server_rate * tau + (
     server_rate - arrival_rate) * k * tau) ** 2) / (
     2 * (std_dev ** 2) * (k * tau) ** (2 * hurst))
+
   backlog <- sum(exp(exponent))
 
   return(backlog)
@@ -33,10 +40,12 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 # print("backlog bound:")
 # print(backlog_bound(time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
 #                     server_rate = 1.0, arrival_rate = 0.6, tau = 1.0))
-
+#
 # for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
-#   print(backlog_bound(time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-#                             server_rate = 1.0, arrival_rate = 0.6, tau = tau))
+#   print(paste0("tau: ", tau))
+#   print(paste0("bound: ", backlog_bound(
+#     time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#     server_rate = 1.0, arrival_rate = 0.6, tau = tau)))
 # }
 
 # numerical evuluation shows that a tau value of 0.85 is optimal for this
@@ -67,6 +76,9 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
                                arrival_rate, conflevel = 0.95) {
   if (server_rate < arrival_rate) {
     stop("The server rate has to be greater than the arrival rate")
+  }
+  if ((x - arrival_rate) * tau <= 0) {
+    stop("theta's sign constraint is violated for k=1")
   }
 
   backlog_stat <- (1 - conflevel) + backlog_bound(
