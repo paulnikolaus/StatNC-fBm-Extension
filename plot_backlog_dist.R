@@ -10,7 +10,7 @@ source("Bound.R") # inverse_bound()
 # Plots the empirical backlog distribution.
 
 plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
-                              trad, gran = 1000) {
+                              trad, conflevel, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
   maximum <- max(computed_dist)
@@ -31,7 +31,7 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
     j <- j + 1
   }
   # 99,99% percentile
-  nnb <- bl[min(which(pz >= 0.9999))]
+  nnb <- bl[min(which(pz >= conflevel))]
 
   frame <- data.frame(backlog = bl, perc = pz)
   # Prepare plot and plot backlog, trad and stat lines,
@@ -62,7 +62,7 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
 
 plot_and_bound <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-  splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
+  splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
   d <- compute_distribution(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
@@ -116,7 +116,7 @@ plot_and_bound <- function(
 
   plot_distribution(
     computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
-    stat_upper = stat_upper, trad = bound)
+    stat_upper = stat_upper, trad = bound, conflevel = conflevel)
 
   # theme_set(theme_bw(base_size = 18))
   # qplot(x = 1:length(d), y = d) +
