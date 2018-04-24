@@ -46,7 +46,7 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
     geom_vline(xintercept = c(stat), colour = "black") +
     geom_vline(xintercept = c(stat_lower), colour = "darkgreen",
                linetype = "dotted") +
-    geom_vline(xintercept = c(stat_upper), colour = "#lightgreen",
+    geom_vline(xintercept = c(stat_upper), colour = "lightgreen",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     scale_x_log10() +
