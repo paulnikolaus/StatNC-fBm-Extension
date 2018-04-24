@@ -40,13 +40,13 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
   q <- ggplot(frame, aes(x = backlog, y = perc)) +
     theme_bw(base_size = 18) +
     theme(legend.position = "none") +
-    geom_line(size = 1, colour = "#009E73") +
-    geom_vline(xintercept = c(nnb)) +
-    geom_vline(xintercept = c(trad), colour = "#56B4E9") +
-    geom_vline(xintercept = c(stat), colour = "#E69F00") +
-    geom_vline(xintercept = c(stat_lower), colour = "#E69F00",
+    geom_line(size = 1, colour = "blue") +
+    geom_vline(xintercept = c(nnb), colour = "blue") +
+    geom_vline(xintercept = c(trad), colour = "red") +
+    geom_vline(xintercept = c(stat), colour = "black") +
+    geom_vline(xintercept = c(stat_lower), colour = "darkgreen",
                linetype = "dotted") +
-    geom_vline(xintercept = c(stat_upper), colour = "#E69F00",
+    geom_vline(xintercept = c(stat_upper), colour = "#lightgreen",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     scale_x_log10() +
