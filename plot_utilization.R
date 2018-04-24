@@ -64,7 +64,7 @@ plot_backlog_vs_util <- function() {
 
   colnames(backlog_bounds_df) <- c(
     "utilizations", "Mean of StatNC bounds", "SNC Bound",
-    "Quantile of Simulated Backlog")
+    "Simulation")
 
   long_df <- melt(backlog_bounds_df, id = "utilizations",
                   variable.name = "type",
