@@ -9,7 +9,7 @@ source("Bound.R") # inverse_bound()
 
 # Plots the empirical backlog distribution.
 
-plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
+plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
                               trad, conflevel, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
@@ -20,9 +20,9 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
   # The cumulative backlog distribution curve
   # Init with 0
   pz <- rep(0, length(bl))
-  labels  <-  data.frame(y = c(0.2, 0.4), x = c(trad, stat),
+  labels  <-  data.frame(y = c(0.2, 0.4), x = c(trad, stat_mean),
                          label = c(round(trad, digits = 3),
-                                   round(stat, digits = 3)))
+                                   round(stat_mean, digits = 3)))
 
   # Build the cumulative distribution
   j  <-  1
@@ -43,18 +43,21 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
     geom_line(size = 1, colour = "blue") +
     geom_vline(xintercept = c(nnb), colour = "blue") +
     geom_vline(xintercept = c(trad), colour = "red") +
-    geom_vline(xintercept = c(stat), colour = "black") +
-    geom_vline(xintercept = c(stat_lower), colour = "darkgreen",
+    geom_vline(xintercept = c(stat_mean), colour = "black") +
+    geom_vline(xintercept = c(stat_lower), colour = "aquamarine4",
                linetype = "dotted") +
-    geom_vline(xintercept = c(stat_upper), colour = "lightgreen",
+    geom_vline(xintercept = c(stat_upper), colour = "aquamarine4",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
-    #annotate("text", x= 10, y=0.5, label="StatNC") + 
-    annotate("text", x = c(nnb - maximum/3,nnb - maximum/3), y=c(0.25, 0.70), label = c("SNC", "StatNC")) +
-    geom_segment(aes(x = nnb - maximum/7, y = 0.25, xend = trad, yend = 0.25),
-                   size=0.4,arrow = NULL) +
-    geom_segment(aes(x = nnb - maximum/10, y = 0.7, xend = stat_mean, yend = 0.7),
-                 size=0.4,arrow = NULL) +
+    #annotate("text", x= 10, y=0.5, label="StatNC") +
+    annotate("text", x = c(nnb - maximum / 3, nnb - maximum / 3),
+             y = c(0.25, 0.70), label = c("SNC", "StatNC")) +
+    geom_segment(aes(x = nnb - maximum / 7, y = 0.25, xend = trad,
+                     yend = 0.25),
+                 size = 0.4, arrow = NULL) +
+    geom_segment(aes(x = nnb - maximum / 10, y = 0.7, xend = stat_mean,
+                     yend = 0.7),
+                 size = 0.4, arrow = NULL) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
     xlab("Backlog") +
@@ -85,43 +88,43 @@ plot_and_bound <- function(
   #   confint.conflevel = 0.95)
 
   # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
-  h.confint <- interval_h_up_alter(
+  h.confint <- interval_h_up_quantile(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-    conflevel_beta = 0.99999)
+    quantile_prob = 0.95)
 
   # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
   #                      conflevel = conflevel)
   # print(paste0("Hurst_up_mean = ", h.confint[1],
   #              ", Hurst_up_lower = ", h.confint[2],
   #              ", Hurst_up_upper = ", h.confint[3]))
-  print(paste0("Hurst_mean = ", h.confint[1],
+  print(paste0("Hurst_lower_quant = ", h.confint[1],
                ", Hurst_up_mean = ", h.confint[2],
-               ", Hurst_up_beta = ", h.confint[3]))
+               ", Hurst_upper_quant = ", h.confint[3]))
 
   stat_mean <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_up",
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_up_mean",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   print(paste0("stat_mean = ", stat_mean))
 
   stat_lower <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_est",
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_lower_quant",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   print(paste0("stat_lower = ", stat_lower))
 
   stat_upper <- inverse_bound(
-    time_n = time_n, std_dev = std_dev, hurst = h.confint$"hurst_up_beta",
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_upper_quant",
     arrival_rate = arrival_rate,
     server_rate = server_rate, p = 1 / iterations, splits = splits,
     conflevel = conflevel, estimated_h = TRUE)
   print(paste0("stat_upper = ", stat_upper))
 
   plot_distribution(
-    computed_dist = d, stat = stat_mean, stat_lower = stat_lower,
+    computed_dist = d, stat_mean = stat_mean, stat_lower = stat_lower,
     stat_upper = stat_upper, trad = bound, conflevel = conflevel)
 
   # theme_set(theme_bw(base_size = 18))

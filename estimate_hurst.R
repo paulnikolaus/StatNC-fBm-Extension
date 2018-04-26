@@ -203,17 +203,11 @@ mean_of_h_up <- function(
 # conflevel: confidence level of hurst estimation
 # conflevel_beta: compute another h_up for a higher confidence level
 
-interval_h_up_alter <- function(
+interval_h_up_quantile <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
-  conflevel_beta) {
+  quantile_prob) {
 
-  if (conflevel_beta < conflevel) {
-    stop("the beta confidence level must be higher than the normal one")
-  }
-
-  hurst_est <- rep(NA, iterations)
   hurst_up <- rep(NA, iterations)
-  hurst_up_beta <- rep(NA, iterations)
 
   flow_to_h_est_up_short <- function(flow_increments, conflevel) {
     return(flow_to_h_est_up(
@@ -227,23 +221,17 @@ interval_h_up_alter <- function(
       sample_length = sample_length, std_dev = std_dev)
     est_up <- flow_to_h_est_up_short(
       flow_increments = f, conflevel = conflevel)
-    hurst_est[i] <- unlist(est_up)[1]
     hurst_up[i] <- unlist(est_up)[2]
-    hurst_up_beta[i] <- estimate_h_up(
-      sample_length = sample_length,
-      h_estimated = hurst_est[i], conflevel = conflevel_beta)
 
-    .show_progress(i, iterations, "interval_h_up_alter()")
+    .show_progress(i, iterations, "interval_h_up_quantile()")
   }
-  hurst_est_means <- mean(hurst_est)
   hurst_up_means <- mean(hurst_up)
-  hurst_up_beta_means <- mean(hurst_up_beta)
 
-  # c(h_estimated, h_up, h_up^beta)
-  return(list("hurst_est" = hurst_est_means, "hurst_up" = hurst_up_means,
-              "hurst_up_beta" = hurst_up_beta_means))
+  return(list("Hurst_lower_quant" = quantile(hurst_up, 1 - quantile_prob / 2),
+              "Hurst_up_mean" = hurst_up_means,
+              "Hurst_upper_quant" = quantile(hurst_up, quantile_prob / 2)))
 }
 
-# print(interval_h_up_alter(
+# print(interval_h_up_quantile(
 #   sample_length = 2 ** 13, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,
-#   conflevel = 0.999, iterations = 100, conflevel_beta = 0.999999))
+#   conflevel = 0.999, iterations = 100, quantile_prob = 0.95))
