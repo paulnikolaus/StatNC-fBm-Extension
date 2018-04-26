@@ -79,12 +79,12 @@ plot_backlog_vs_util <- function() {
     scale_color_manual(values = c("black", "red", "blue")) +
     scale_shape_manual(values = c(17, 19, 18)) +
     
-    geom_label(aes(x = 0.8, y = 19.5, label = "Mean of StatNC bounds"),
-               fill = "white") +
+    geom_label(aes(x = 0.77, y = 19.5, label = "Mean of StatNC bounds"),
+               fill = "white", size = 5) +
     geom_label(aes(x = 0.92, y = 16, label = "SNC Bound"),
-               fill = "white") +
+               fill = "white", size = 5) +
     geom_label(aes(x = 0.9, y = 5, label = "Simulation"),
-               fill = "white") +
+               fill = "white", size = 5) +
     
     theme_set(theme_bw(base_size = 19)) +
     # theme(legend.position = c(0.25, 0.8),
