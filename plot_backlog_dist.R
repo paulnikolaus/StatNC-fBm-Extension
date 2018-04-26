@@ -49,6 +49,12 @@ plot_distribution <- function(computed_dist, stat, stat_lower, stat_upper,
     geom_vline(xintercept = c(stat_upper), colour = "lightgreen",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
+    #annotate("text", x= 10, y=0.5, label="StatNC") + 
+    annotate("text", x = c(nnb - maximum/3,nnb - maximum/3), y=c(0.25, 0.70), label = c("SNC", "StatNC")) +
+    geom_segment(aes(x = nnb - maximum/7, y = 0.25, xend = trad, yend = 0.25),
+                   size=0.4,arrow = NULL) +
+    geom_segment(aes(x = nnb - maximum/10, y = 0.7, xend = stat_mean, yend = 0.7),
+                 size=0.4,arrow = NULL) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
     xlab("Backlog") +
@@ -123,6 +129,7 @@ plot_and_bound <- function(
   # geom_line(aes(y = bound, color = "bound"))
   # return(list("SNC" = bound, "distribution" = d))
 }
+
 
 q <- plot_and_bound(
   sample_length = 2 ** 15,
