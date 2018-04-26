@@ -226,10 +226,12 @@ interval_h_up_quantile <- function(
     .show_progress(i, iterations, "interval_h_up_quantile()")
   }
   hurst_up_means <- mean(hurst_up)
+  
+  beta <- 1 - quantile_prob
 
-  return(list("Hurst_lower_quant" = quantile(hurst_up, 1 - quantile_prob / 2),
+  return(list("Hurst_lower_quant" = quantile(hurst_up, 1 - beta / 2),
               "Hurst_up_mean" = hurst_up_means,
-              "Hurst_upper_quant" = quantile(hurst_up, quantile_prob / 2)))
+              "Hurst_upper_quant" = quantile(hurst_up, beta / 2)))
 }
 
 # print(interval_h_up_quantile(
