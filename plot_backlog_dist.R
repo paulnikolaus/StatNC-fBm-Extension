@@ -49,14 +49,12 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     geom_vline(xintercept = c(stat_upper), colour = "aquamarine4",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
-    annotate("text", x = c(nnb - maximum / 3, nnb - maximum / 3),
-             y = c(0.25, 0.70), label = c("SNC", "StatNC")) +
-    geom_segment(aes(x = nnb - maximum / 7, y = 0.25, xend = trad,
-                     yend = 0.25),
-                 size = 0.4, arrow = NULL) +
-    geom_segment(aes(x = nnb - maximum / 10, y = 0.7, xend = stat_mean,
-                     yend = 0.7),
-                 size = 0.4, arrow = NULL) +
+    annotate("text", x = c(nnb - 0.4 * maximum, nnb - 0.4 * maximum),
+             y = c(0.30, 0.70), label = c("SNC", "StatNC"), size = 5.5) +
+    geom_segment(aes(x = nnb - maximum / 7, y = 0.3, xend = trad,
+                     yend = 0.3), size = 0.4, arrow = NULL) +
+    geom_segment(aes(x = nnb - maximum / 12, y = 0.7, xend = stat_mean,
+                     yend = 0.7), size = 0.4, arrow = NULL) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
     xlab("Backlog") +
