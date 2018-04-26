@@ -49,7 +49,6 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     geom_vline(xintercept = c(stat_upper), colour = "aquamarine4",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
-    #annotate("text", x= 10, y=0.5, label="StatNC") +
     annotate("text", x = c(nnb - maximum / 3, nnb - maximum / 3),
              y = c(0.25, 0.70), label = c("SNC", "StatNC")) +
     geom_segment(aes(x = nnb - maximum / 7, y = 0.25, xend = trad,

@@ -78,10 +78,19 @@ plot_backlog_vs_util <- function() {
     scale_linetype_manual(values = c("dashed", "F1", "dotdash")) +
     scale_color_manual(values = c("black", "red", "blue")) +
     scale_shape_manual(values = c(17, 19, 18)) +
+    
+    geom_label(aes(x = 0.8, y = 19.5, label = "Mean of StatNC bounds"),
+               fill = "white") +
+    geom_label(aes(x = 0.92, y = 16, label = "SNC Bound"),
+               fill = "white") +
+    geom_label(aes(x = 0.9, y = 5, label = "Simulation"),
+               fill = "white") +
+    
     theme_set(theme_bw(base_size = 19)) +
-    theme(legend.position = c(0.25, 0.8),
-          legend.background = element_rect(color = "black"),
-          axis.text = element_text(size = 20)) +
+    # theme(legend.position = c(0.25, 0.8),
+    #       legend.background = element_rect(color = "black"),
+    #       axis.text = element_text(size = 20)) +
+    theme(legend.position = "none") +
     xlab("Utilization") +
     ylab("Backlog Bound") +
     theme(legend.title = element_blank())
