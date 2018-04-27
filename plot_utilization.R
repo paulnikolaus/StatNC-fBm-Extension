@@ -91,15 +91,15 @@ plot_backlog_vs_util <- function() {
                                   group = type)) +
     geom_line(aes(color = type, linetype = type), size = 0.8) +
     geom_point(aes(color = type, shape = type), size = 2.8) +
-    scale_linetype_manual(values = c("solid", "dashed", "dashed", "F1", "dotdash")) +
-    scale_color_manual(values = c("black", "aquamarine4", "red", "aquamarine4", "blue")) +
+    scale_linetype_manual(values = c("dashed", "solid", "dashed", "F1", "dotdash")) +
+    scale_color_manual(values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
     scale_shape_manual(values = c(17, 19, 18, 20, 20)) +
     
-    geom_label(aes(x = 0.77, y = 19.5, label = "Mean of StatNC bounds"),
+    geom_label(aes(x = 0.70, y = 40, label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.92, y = 16, label = "SNC Bound"),
+    geom_label(aes(x = 0.85, y = 22, label = "SNC Bound"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.9, y = 5, label = "Simulation"),
+    geom_label(aes(x = 0.92, y = 3, label = "Simulation"),
                fill = "white", size = 5) +
     
     theme_set(theme_bw(base_size = 19)) +
@@ -114,14 +114,14 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-csv_backlog_vs_util(
-  sample_length = 2 ** 14,
-  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
-  std_dev = 1.0, splits = 20, conflevel = 0.9999,
-  iterations = 1200)
+# csv_backlog_vs_util(
+#   sample_length = 2 ** 14,
+#   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
+#   std_dev = 1.0, splits = 20, conflevel = 0.9999,
+#   iterations = 1200)
 
-# pdf("backlog_vs_util.pdf", width = 8, height = 5)
-# 
-# plot_backlog_vs_util()
-# 
-# dev.off()
+pdf("backlog_vs_util.pdf", width = 8, height = 5)
+
+plot_backlog_vs_util()
+
+dev.off()
