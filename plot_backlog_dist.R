@@ -21,8 +21,8 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   # Init with 0
   pz <- rep(0, length(bl))
   labels  <-  data.frame(y = c(0.2, 0.4), x = c(trad, stat_mean),
-                         label = c(round(trad, digits = 3),
-                                   round(stat_mean, digits = 3)))
+                         label = c(round(trad, digits = 0),
+                                   round(stat_mean, digits = 0)))
 
   # Build the cumulative distribution
   j  <-  1
