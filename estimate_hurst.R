@@ -209,19 +209,18 @@ interval_h_up_quantile <- function(
 
   hurst_up <- rep(NA, iterations)
 
-  flow_to_h_est_up_short <- function(flow_increments, conflevel) {
+  flow_to_h_up_short <- function(flow_increments, conflevel) {
     return(flow_to_h_est_up(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
-      std_dev = std_dev, conflevel = conflevel))
+      std_dev = std_dev, conflevel = conflevel)$"h_up")
   }
 
   for (i in 1:iterations) {
     f <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
       sample_length = sample_length, std_dev = std_dev)
-    est_up <- flow_to_h_est_up_short(
+    hurst_up[i] <- flow_to_h_up_short(
       flow_increments = f, conflevel = conflevel)
-    hurst_up[i] <- unlist(est_up)[2]
 
     .show_progress(i, iterations, "interval_h_up_quantile()")
   }
@@ -229,9 +228,9 @@ interval_h_up_quantile <- function(
   
   beta <- 1 - quantile_prob
 
-  return(list("Hurst_lower_quant" = quantile(hurst_up, 1 - beta / 2),
+  return(list("Hurst_lower_quant" = quantile(hurst_up, beta / 2),
               "Hurst_up_mean" = hurst_up_means,
-              "Hurst_upper_quant" = quantile(hurst_up, beta / 2)))
+              "Hurst_upper_quant" = quantile(hurst_up, 1 - beta / 2)))
 }
 
 # print(interval_h_up_quantile(

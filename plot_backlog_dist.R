@@ -73,7 +73,7 @@ plot_and_bound <- function(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
     iterations = iterations)
-  bound <- inverse_bound(
+  snc_bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
     splits = splits, conflevel = conflevel, estimated_h = FALSE)
@@ -122,7 +122,7 @@ plot_and_bound <- function(
 
   plot_distribution(
     computed_dist = d, stat_mean = stat_mean, stat_lower = stat_lower,
-    stat_upper = stat_upper, trad = bound, conflevel = conflevel)
+    stat_upper = stat_upper, trad = snc_bound, conflevel = conflevel)
 
   # theme_set(theme_bw(base_size = 18))
   # qplot(x = 1:length(d), y = d) +

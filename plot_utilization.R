@@ -16,9 +16,11 @@ csv_backlog_vs_util <- function(
   utilizations <- (10:19) / 20
 
   simulated_backlog <- rep(NA, length(utilizations))
-  bound <- rep(NA, length(utilizations))
-  h_up_est <- rep(NA, length(utilizations))
+  snc_bound <- rep(NA, length(utilizations))
+  h_up_interval <- rep(NA, length(utilizations))
   stat_mean <- rep(NA, length(utilizations))
+  stat_low <- rep(NA, length(utilizations))
+  stat_up <- rep(NA, length(utilizations))
   i <- 1
 
   for (util in utilizations) {
@@ -29,29 +31,43 @@ csv_backlog_vs_util <- function(
       iterations = iterations)), probs = conflevel)
     print(paste0("simulated_backlog: ", simulated_backlog[i]))
 
-    bound[i] <- inverse_bound(
+    snc_bound[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev, hurst = hurst,
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = FALSE)
-    print(paste0("bound: ", bound[i]))
+    print(paste0("snc_bound: ", snc_bound[i]))
 
-    h_up_est[i] <- mean_of_h_up(
+    h_up_interval[i] <- interval_h_up_quantile(
       sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-      std_dev = std_dev, conflevel = conflevel, iterations = iterations)
+      std_dev = std_dev, conflevel = conflevel, iterations = iterations,
+      quantile_prob = 0.95)
 
     stat_mean[i] <- inverse_bound(
-      time_n = time_n, std_dev = std_dev, hurst = h_up_est[i],
-      arrival_rate = arrival_rate,
-      server_rate = 1 / util, p = 1 / iterations, splits = splits,
-      conflevel = conflevel, estimated_h = TRUE)
+      time_n = time_n, std_dev = std_dev,
+      hurst = h_up_interval[i]$"Hurst_up_mean",
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      splits = splits, conflevel = conflevel, estimated_h = TRUE)
     print(paste0("stat_mean: ", stat_mean[i]))
+    
+    stat_low[i] <- inverse_bound(
+      time_n = time_n, std_dev = std_dev,
+      hurst = h_up_interval[i]$"Hurst_lower_quant",
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      splits = splits, conflevel = conflevel, estimated_h = TRUE)
+    
+    stat_up[i] <- inverse_bound(
+      time_n = time_n, std_dev = std_dev,
+      hurst = h_up_interval[i]$"Hurst_upper_quant",
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      splits = splits, conflevel = conflevel, estimated_h = TRUE)
 
     i <- i + 1
   }
 
 
   backlog_bounds_df <- as.data.frame(
-    cbind(utilizations, stat_mean, bound, simulated_backlog))
+    cbind(utilizations, stat_mean, stat_low, stat_up, snc_bound,
+          simulated_backlog))
 
   write.csv(backlog_bounds_df, file = "backlog_bounds.csv",
             row.names = FALSE)
@@ -63,8 +79,8 @@ plot_backlog_vs_util <- function() {
   backlog_bounds_df <- read.csv(file = "backlog_bounds.csv")
 
   colnames(backlog_bounds_df) <- c(
-    "utilizations", "Mean of StatNC bounds", "SNC Bound",
-    "Simulation")
+    "utilizations", "Mean of StatNC bounds", "StatNC low", "StatNC up",
+    "SNC Bound", "Simulation")
 
   long_df <- melt(backlog_bounds_df, id = "utilizations",
                   variable.name = "type",
@@ -75,9 +91,9 @@ plot_backlog_vs_util <- function() {
                                   group = type)) +
     geom_line(aes(color = type, linetype = type), size = 0.8) +
     geom_point(aes(color = type, shape = type), size = 2.8) +
-    scale_linetype_manual(values = c("dashed", "F1", "dotdash")) +
-    scale_color_manual(values = c("black", "red", "blue")) +
-    scale_shape_manual(values = c(17, 19, 18)) +
+    scale_linetype_manual(values = c("solid", "F1", "dotdash", "dashed", "dashed")) +
+    scale_color_manual(values = c("black", "red", "blue", "aquamarine4", "aquamarine4")) +
+    scale_shape_manual(values = c(17, 19, 18, 20, 20)) +
     
     geom_label(aes(x = 0.77, y = 19.5, label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
@@ -98,14 +114,14 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-# csv_backlog_vs_util(
-#   sample_length = 2 ** 14,
-#   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
-#   std_dev = 1.0, splits = 20, conflevel = 0.9999,
-#   iterations = 1000)
+csv_backlog_vs_util(
+  sample_length = 2 ** 14,
+  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
+  std_dev = 1.0, splits = 20, conflevel = 0.9999,
+  iterations = 1200)
 
-pdf("backlog_vs_util.pdf", width = 8, height = 5)
-
-plot_backlog_vs_util()
-
-dev.off()
+# pdf("backlog_vs_util.pdf", width = 8, height = 5)
+# 
+# plot_backlog_vs_util()
+# 
+# dev.off()
