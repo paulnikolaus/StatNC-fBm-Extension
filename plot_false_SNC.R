@@ -159,7 +159,6 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   frame <- data.frame(backlog = bl, perc = pz)
   # Prepare plot and plot backlog, trad and stat lines,
   # remove legend and set theme to bw
-  
   q <- ggplot(frame, aes(x = backlog, y = perc)) +
     theme_bw(base_size = 18) +
     theme(legend.position = "none") +
@@ -174,11 +173,11 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     geom_label(aes(x = nnb - 0.4 * maximum, y = 0.3, label = "SNC"),
                fill = "white", size = 5) +
-    geom_label(aes(x = stat_lower - 0.4 * maximum, y = 0.7, label = "StatNC"),
+    geom_label(aes(x = stat_lower - 0.31 * maximum, y = 0.7, label = "StatNC"),
                fill = "white", size = 5) +
     geom_segment(aes(x = nnb - maximum / 7, y = 0.3, xend = trad,
                      yend = 0.3), size = 0.4, arrow = NULL) +
-    geom_segment(aes(x = stat_lower - 0.15 * maximum, y = 0.7, xend = stat_mean,
+    geom_segment(aes(x = stat_lower - 0.2 * maximum, y = 0.7, xend = stat_mean,
                      yend = 0.7), size = 0.4, arrow = NULL) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
@@ -208,11 +207,11 @@ generate_values_and_write_to_csv = function(
   write.table(df, file = "backlog_dist_statnc_fail.csv", sep = ";", col.names = TRUE, row.names = FALSE)
 }
 
-generate_values_and_write_to_csv(
-    sample_length = 2 ** 15,
-    arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
-    server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0,
-    conflevel = 0.999, iterations = 200)
+# generate_values_and_write_to_csv(
+#     sample_length = 2 ** 15,
+#     arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
+#     server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0,
+#     conflevel = 0.999, iterations = 200)
 
 q <- plot_and_bound(
   sample_length = 2 ** 15,
