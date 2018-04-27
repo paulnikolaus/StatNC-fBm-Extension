@@ -205,7 +205,7 @@ mean_of_h_up <- function(
 
 interval_h_up_quantile <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
-  quantile_prob) {
+  quantile_prob = 0.95) {
 
   hurst_up <- rep(NA, iterations)
 
@@ -228,9 +228,9 @@ interval_h_up_quantile <- function(
   
   beta <- 1 - quantile_prob
 
-  return(list("Hurst_lower_quant" = quantile(hurst_up, beta / 2),
+  return(list("Hurst_lower_quant" = quantile(hurst_up, beta / 2)[[1]],
               "Hurst_up_mean" = hurst_up_means,
-              "Hurst_upper_quant" = quantile(hurst_up, 1 - beta / 2)))
+              "Hurst_upper_quant" = quantile(hurst_up, 1 - beta / 2)[[1]]))
 }
 
 # print(interval_h_up_quantile(

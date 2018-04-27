@@ -17,7 +17,6 @@ csv_backlog_vs_util <- function(
 
   simulated_backlog <- rep(NA, length(utilizations))
   snc_bound <- rep(NA, length(utilizations))
-  h_up_interval <- rep(NA, length(utilizations))
   stat_mean <- rep(NA, length(utilizations))
   stat_low <- rep(NA, length(utilizations))
   stat_up <- rep(NA, length(utilizations))
@@ -37,27 +36,28 @@ csv_backlog_vs_util <- function(
       splits = splits, conflevel = conflevel, estimated_h = FALSE)
     print(paste0("snc_bound: ", snc_bound[i]))
 
-    h_up_interval[i] <- interval_h_up_quantile(
+    h_up_quantile <- interval_h_up_quantile(
       sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
       std_dev = std_dev, conflevel = conflevel, iterations = iterations,
       quantile_prob = 0.95)
+    print(h_up_quantile)
 
     stat_mean[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
-      hurst = h_up_interval[i]$"Hurst_up_mean",
+      hurst = h_up_quantile$"Hurst_up_mean",
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
     print(paste0("stat_mean: ", stat_mean[i]))
     
     stat_low[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
-      hurst = h_up_interval[i]$"Hurst_lower_quant",
+      hurst = h_up_quantile$"Hurst_lower_quant",
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
     
     stat_up[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
-      hurst = h_up_interval[i]$"Hurst_upper_quant",
+      hurst = h_up_quantile$"Hurst_upper_quant",
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
 
