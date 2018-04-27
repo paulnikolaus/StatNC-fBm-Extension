@@ -13,7 +13,7 @@ source("Bound.R") # inverse_bound()
 csv_backlog_vs_util <- function(
   sample_length, arrival_rate, hurst, time_n, std_dev = 1.0,
   splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
-  utilizations <- (10:19) / 20
+  utilizations <- (13:19) / 20
 
   simulated_backlog <- rep(NA, length(utilizations))
   snc_bound <- rep(NA, length(utilizations))
@@ -91,13 +91,15 @@ plot_backlog_vs_util <- function() {
                                   group = type)) +
     geom_line(aes(color = type, linetype = type), size = 0.8) +
     geom_point(aes(color = type, shape = type), size = 2.8) +
-    scale_linetype_manual(values = c("dashed", "solid", "dashed", "F1", "dotdash")) +
-    scale_color_manual(values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
-    scale_shape_manual(values = c(17, 19, 18, 20, 20)) +
+    scale_linetype_manual(
+      values = c("dashed", "solid", "dashed", "F1", "dotdash")) +
+    scale_color_manual(
+      values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
+    scale_shape_manual(values = c(20, 19, 20, 18, 17)) +
     
-    geom_label(aes(x = 0.70, y = 40, label = "Mean of StatNC bounds"),
+    geom_label(aes(x = 0.77, y = 35, label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.85, y = 22, label = "SNC Bound"),
+    geom_label(aes(x = 0.85, y = 20, label = "SNC Bound"),
                fill = "white", size = 5) +
     geom_label(aes(x = 0.92, y = 3, label = "Simulation"),
                fill = "white", size = 5) +
@@ -115,7 +117,7 @@ plot_backlog_vs_util <- function() {
 }
 
 # csv_backlog_vs_util(
-#   sample_length = 2 ** 14,
+#   sample_length = 2 ** 15,
 #   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 100,
 #   std_dev = 1.0, splits = 20, conflevel = 0.9999,
 #   iterations = 1200)
