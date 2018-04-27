@@ -123,17 +123,47 @@ plot_and_bound <- function(
   #                            iterations = iterations, viol_prob = 1 / iterations,
   #                            t_time = time_n, server_rate = server_rate)
   
-  interval = compute_statnc_interval(inverse_backlog = df$statnc_ibl)
+  fail_interval = compute_statnc_interval(inverse_backlog = df$statnc_ibl)
+  
+  df_statnormal = read.table(file = "backlog_dist_h_confint.csv", sep = ";", header = TRUE)
+  
+  h.confint = compute_h_up_quantile(hVector = df_statnormal$hvector)
+  
+  stat_mean <- inverse_bound(
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_up_mean",
+    arrival_rate = arrival_rate,
+    server_rate = server_rate, p = 1 / iterations, splits = splits,
+    conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_mean = ", stat_mean))
+  
+  stat_lower <- inverse_bound(
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_lower_quant",
+    arrival_rate = arrival_rate,
+    server_rate = server_rate, p = 1 / iterations, splits = splits,
+    conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_lower = ", stat_lower))
+  
+  stat_upper <- inverse_bound(
+    time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_upper_quant",
+    arrival_rate = arrival_rate,
+    server_rate = server_rate, p = 1 / iterations, splits = splits,
+    conflevel = conflevel, estimated_h = TRUE)
+  print(paste0("stat_upper = ", stat_upper))
   
   plot_distribution(
-    computed_dist = df$bl_distribution, stat_mean = interval[["ibl_mean"]], stat_lower = interval[["ibl_lower"]],
-    stat_upper = interval[["ibl_upper"]], trad = snc_bound, conflevel = conflevel)
+    computed_dist = df$bl_distribution, stat_mean = stat_mean,
+    stat_lower = stat_lower,
+    stat_upper = stat_upper, 
+    stat_fail_mean = fail_interval[["ibl_mean"]], stat_fail_lower = fail_interval[["ibl_lower"]],
+    stat_fail_upper = fail_interval[["ibl_upper"]],
+    conflevel = conflevel)
 }
 
 # Plots the empirical backlog distribution.
 
 plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
-                              trad, conflevel, gran = 1000) {
+                              stat_fail_mean, stat_fail_lower, stat_fail_upper,
+                              conflevel, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
   maximum <- max(computed_dist)
@@ -143,8 +173,8 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   # The cumulative backlog distribution curve
   # Init with 0
   pz <- rep(0, length(bl))
-  labels  <-  data.frame(y = c(0.2, 0.4), x = c(trad, stat_mean),
-                         label = c(round(trad, digits = 0),
+  labels  <-  data.frame(y = c(0.2, 0.4), x = c(stat_fail_mean, stat_mean),
+                         label = c(round(stat_fail_mean, digits = 0),
                                    round(stat_mean, digits = 0)))
   
   # Build the cumulative distribution
@@ -164,20 +194,26 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     theme(legend.position = "none") +
     geom_line(size = 1, colour = "blue") +
     geom_vline(xintercept = c(nnb), colour = "blue") +
-    geom_vline(xintercept = c(trad), colour = "red") +
-    geom_vline(xintercept = c(stat_mean), colour = "black") +
+    # StatNC Fail Bound
+    geom_vline(xintercept = c(stat_fail_mean), colour = "black") +
+    geom_vline(xintercept = c(stat_fail_lower), colour = "black",
+               linetype = "dotted") +
+    geom_vline(xintercept = c(stat_fail_upper), colour = "black",
+               linetype = "dotted") +
+    # Correct StatNC Bound
+    geom_vline(xintercept = c(stat_mean), colour = "aquamarine4") +
     geom_vline(xintercept = c(stat_lower), colour = "aquamarine4",
                linetype = "dotted") +
     geom_vline(xintercept = c(stat_upper), colour = "aquamarine4",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
-    geom_label(aes(x = nnb - 0.4 * maximum, y = 0.3, label = "SNC"),
+    geom_label(aes(x = stat_fail_lower - 0.4 * maximum, y = 0.3, label = "StatNC (i.i.d.)"),
                fill = "white", size = 5) +
-    geom_label(aes(x = stat_lower - 0.31 * maximum, y = 0.7, label = "StatNC"),
+    geom_label(aes(x = stat_fail_lower - 0.4 * maximum, y = 0.7, label = "StatNC (l.r.d.)"),
                fill = "white", size = 5) +
-    geom_segment(aes(x = nnb - maximum / 7, y = 0.3, xend = trad,
+    geom_segment(aes(x = stat_fail_lower - 0.28 * maximum, y = 0.3, xend = stat_fail_mean,
                      yend = 0.3), size = 0.4, arrow = NULL) +
-    geom_segment(aes(x = stat_lower - 0.2 * maximum, y = 0.7, xend = stat_mean,
+    geom_segment(aes(x = stat_fail_lower - 0.28 * maximum, y = 0.7, xend = stat_mean,
                      yend = 0.7), size = 0.4, arrow = NULL) +
     scale_x_log10() +
     annotation_logticks(sides = "b") +
