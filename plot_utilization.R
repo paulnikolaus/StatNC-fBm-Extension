@@ -66,7 +66,7 @@ csv_backlog_vs_util <- function(
 
 
   backlog_bounds_df <- as.data.frame(
-    cbind(utilizations, stat_mean, stat_low, stat_up, snc_bound,
+    cbind(utilizations, stat_up, stat_mean, stat_low, snc_bound,
           simulated_backlog))
 
   write.csv(backlog_bounds_df, file = "backlog_bounds.csv",
@@ -79,7 +79,7 @@ plot_backlog_vs_util <- function() {
   backlog_bounds_df <- read.csv(file = "backlog_bounds.csv")
 
   colnames(backlog_bounds_df) <- c(
-    "utilizations", "Mean of StatNC bounds", "StatNC low", "StatNC up",
+    "utilizations", "StatNC up", "Mean of StatNC bounds", "StatNC low",
     "SNC Bound", "Simulation")
 
   long_df <- melt(backlog_bounds_df, id = "utilizations",
@@ -91,8 +91,8 @@ plot_backlog_vs_util <- function() {
                                   group = type)) +
     geom_line(aes(color = type, linetype = type), size = 0.8) +
     geom_point(aes(color = type, shape = type), size = 2.8) +
-    scale_linetype_manual(values = c("solid", "F1", "dotdash", "dashed", "dashed")) +
-    scale_color_manual(values = c("black", "red", "blue", "aquamarine4", "aquamarine4")) +
+    scale_linetype_manual(values = c("solid", "dashed", "dashed", "F1", "dotdash")) +
+    scale_color_manual(values = c("black", "aquamarine4", "red", "aquamarine4", "blue")) +
     scale_shape_manual(values = c(17, 19, 18, 20, 20)) +
     
     geom_label(aes(x = 0.77, y = 19.5, label = "Mean of StatNC bounds"),
