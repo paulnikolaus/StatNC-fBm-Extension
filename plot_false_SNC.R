@@ -62,7 +62,7 @@ statNC_optimize_ibl_theta = function(viol_prob, t_time, conflevel, emgf,
 
 statNC_interval <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
-  viol_prob, t_time, server_rate, quantile_prob = 0.95) {
+  viol_prob, t_time, server_rate, quantile_prob = 0.95, returnBLVector = FALSE) {
   
   # blimit is the bandwidth limitation of the estimator, in a single time step,
   # no more than blimit arrivals should occur.
@@ -83,9 +83,18 @@ statNC_interval <- function(
      
     .show_progress(i, iterations, "interval_h_up_quantile()")
   }
+  
+  if(returnBLVector) {
+    return(inverse_backlog)
+  } else {
+    return(compute_statnc_interval(inverse_backlog, quantile_prob))
+  }
+}
+
+compute_statnc_interval = function(inverse_backlog, quantile_prob = 0.95) {
   ibl_mean <- mean(inverse_backlog)
   
-  cihelper = ci_help(inverse_backlog, quantile_prob)
+  #cihelper = ci_help(inverse_backlog, quantile_prob)
   #lower = cihelper[[1]]
   #upper = cihelper[[2]]
   lower = min(inverse_backlog)
@@ -95,7 +104,6 @@ statNC_interval <- function(
               "ibl_upper" = upper))
 }
 
-
 # Computes the empirical backlog distribution and
 # the corresponding traditional bound
 
@@ -103,23 +111,22 @@ plot_and_bound <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
   splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
   
-  d <- compute_distribution(
-    arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
-    time_n = time_n, server_rate = server_rate, std_dev = std_dev,
-    iterations = iterations)
+  df = read.table(file = "backlog_dist_statnc_fail.csv", sep = ";", header = TRUE)
   snc_bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
     splits = splits, conflevel = conflevel, estimated_h = FALSE)
   
   # Take the "wrong" estimator now
-  interval = statNC_interval(sample_length = sample_length, arrival_rate = arrival_rate,
-                             hurst = hurst, std_dev, conflevel = conflevel,
-                             iterations = iterations, viol_prob = 1 / iterations,
-                             t_time = time_n, server_rate = server_rate)
+  # interval = statNC_interval(sample_length = sample_length, arrival_rate = arrival_rate,
+  #                            hurst = hurst, std_dev, conflevel = conflevel,
+  #                            iterations = iterations, viol_prob = 1 / iterations,
+  #                            t_time = time_n, server_rate = server_rate)
+  
+  interval = compute_statnc_interval(inverse_backlog = df$statnc_ibl)
   
   plot_distribution(
-    computed_dist = d, stat_mean = interval[["ibl_mean"]], stat_lower = interval[["ibl_lower"]],
+    computed_dist = df$bl_distribution, stat_mean = interval[["ibl_mean"]], stat_lower = interval[["ibl_lower"]],
     stat_upper = interval[["ibl_upper"]], trad = snc_bound, conflevel = conflevel)
 }
 
@@ -180,6 +187,32 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   
   return(q)
 }
+
+generate_values_and_write_to_csv = function(
+  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
+  conflevel = 0.999, iterations = 10 ** 2) {
+  
+  d <- compute_distribution(
+    arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
+    time_n = time_n, server_rate = server_rate, std_dev = std_dev,
+    iterations = iterations)
+
+  # Take the "wrong" estimator now
+  statnc_ibl = statNC_interval(sample_length = sample_length, arrival_rate = arrival_rate,
+                             hurst = hurst, std_dev, conflevel = conflevel,
+                             iterations = iterations, viol_prob = 1 / iterations,
+                             t_time = time_n, server_rate = server_rate, returnBLVector = TRUE)
+  
+  df = data.frame(bl_distribution = d, statnc_ibl)
+  
+  write.table(df, file = "backlog_dist_statnc_fail.csv", sep = ";", col.names = TRUE, row.names = FALSE)
+}
+
+generate_values_and_write_to_csv(
+    sample_length = 2 ** 15,
+    arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
+    server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0,
+    conflevel = 0.999, iterations = 200)
 
 q <- plot_and_bound(
   sample_length = 2 ** 15,
