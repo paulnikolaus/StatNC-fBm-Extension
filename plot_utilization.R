@@ -101,12 +101,14 @@ plot_backlog_vs_util <- function() {
       values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
     scale_shape_manual(values = c(20, 19, 20, 18, 17)) +
     
-    geom_label(aes(x = 0.77, y = 35, label = "Mean of StatNC bounds"),
+    geom_label(aes(x = 0.83, y = max(backlog_bounds_df[3]) * 0.9,
+                   label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.85, y = 20, label = "SNC Bound"),
+    geom_label(aes(x = 0.85, max(backlog_bounds_df[5]) * 0.55,
+                   label = "SNC Bound"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.92, y = 3, label = "Simulation"),
-               fill = "white", size = 5) +
+    geom_label(aes(x = 0.92, max(backlog_bounds_df[6]) * 0.35,
+                   label = "Simulation"), fill = "white", size = 5) +
     
     theme_set(theme_bw(base_size = 19)) +
     # theme(legend.position = c(0.25, 0.8),
@@ -120,11 +122,11 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-csv_backlog_vs_util(
-  sample_length = 2 ** 17,
-  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
-  std_dev = 1.0, splits = 20, conflevel = 0.9999,
-  iterations = 100)
+# csv_backlog_vs_util(
+#   sample_length = 2 ** 17,
+#   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
+#   std_dev = 1.0, splits = 20, conflevel = 0.9999,
+#   iterations = 200)
 
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
