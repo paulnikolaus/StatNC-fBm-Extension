@@ -77,10 +77,10 @@ CetaFGN <- function(eta) {
   lf <- matrix(1, ncol = M, nrow = mhalfm)
   f_O <- fspecFGN(eta, m)$fspec
   for (j in (1:M)) {
-  etaj <- eta
-  etaj[j] <- etaj[j] + delta
-  fj <- fspecFGN(etaj, m)$fspec
-  lf[, j] <- log(fj / f_O) / delta
+    etaj <- eta
+    etaj[j] <- etaj[j] + delta
+    fj <- fspecFGN(etaj, m)$fspec
+    lf[, j] <- log(fj / f_O) / delta
   }
   # Calculate D
   Djl <- matrix(1, ncol = M, nrow = M)
