@@ -17,6 +17,7 @@ source("Bound.R") # inverse_bound()
 exp_traffic_estimator <- function(arrivals, conflevel) {
   num_samples <- length(arrivals)
   sample_sum <- sum(arrivals)
+  # (non-central) Chi-Squared Distribution
   return((qchisq(conflevel, df = 2 * num_samples)) / (2 * sample_sum))
   # = lambda_min
 }
@@ -54,7 +55,7 @@ statNC_inverse_backlog_theta <- function(
   k_time <- seq(0, t_time, 1)
   tmp_sum <- sum(emgf(k_time, t_time, theta) * exp(
     theta * (t_time - k_time) * (-server_rate)))
-  return((log(tmp_sum) - log(viol_prob - 1 + conflevel))/theta)
+  return((log(tmp_sum) - log(viol_prob - 1 + conflevel)) / theta)
 }
 
 # optimizes the theta-dependent bound
@@ -223,7 +224,7 @@ plot_and_bound <- function(
   splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
 
   df <- read.csv(file = "backlog_dist_statnc_fail.csv", header = TRUE)
-  
+
   snc_bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
