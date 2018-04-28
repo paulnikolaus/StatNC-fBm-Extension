@@ -68,12 +68,12 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # h_estimated = estimated value of h
 # conflevel = confidence level of the estimation
 # return: lower and upper confidence interval as a vector
-get_h_up_old <- function(sample_length, h_estimated) {
+get_h_up <- function(sample_length, h_estimated, conflevel) {
   N <- sample_length
 
   D <- CetaFGN(eta = c(H = h_estimated))
   V <- 2 * D  **  (-1)
-  alpha <- 1 - 0.95
+  alpha <- (1 - conflevel)
   # we use the one-sided confidence intervall as we are only worried about
   # underestimation
   # otherwise we have to use 1 - alpha / 2
@@ -100,19 +100,19 @@ get_h_up_old <- function(sample_length, h_estimated) {
 # arrival_rate = arrival_rate used in the traffic model
 # std_dev = std_dev of flow
 # return: lower CI, estimated value, and upper CI as a vector
-flow_to_h_est_up_old <- function(flow_increments, arrival_rate, std_dev,
+flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
                                  conflevel) {
   sample_length <- length(flow_increments)
 
   h_estimated <- estimate_hurst(flow_increments = flow_increments,
                                 arrival_rate = arrival_rate, std_dev = std_dev)
-  h_up <- estimate_h_up(sample_length = sample_length,
-                        h_estimated = h_estimated, conflevel = conflevel)
+  h_up <- get_h_up(sample_length = sample_length, h_estimated = h_estimated,
+                   conflevel = conflevel)
 
   return(list("h_est" = h_estimated, "h_up" = h_up))
 }
 
-flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev) {
+flow_to_h_est_up_alter <- function(flow_increments, arrival_rate, std_dev) {
   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
   
   res <- GetFitFGN(z = fgn_traffic, ciQ = TRUE)
@@ -122,16 +122,10 @@ flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev) {
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 11, std_dev = 1.0)
-# print(flow_to_h_est_up_old(flow_increments = flow_example, arrival_rate = 1.0,
-#                        std_dev = 1.0, conflevel = 0.99))
 # print(flow_to_h_est_up(flow_increments = flow_example, arrival_rate = 1.0,
-#                        std_dev = 1.0, conflevel = 0.99))
-# system.time(flow_to_h_est_up_old(flow_increments = flow_example,
-#                                  arrival_rate = 1.0,
-#                                  std_dev = 1.0, conflevel = 0.99))
-# system.time(flow_to_h_est_up(flow_increments = flow_example,
-#                              arrival_rate = 1.0,std_dev = 1.0,
-#                              conflevel = 0.99))
+#                        std_dev = 1.0, conflevel = 0.95))
+# print(flow_to_h_est_up_alter(flow_increments = flow_example,
+#                              arrival_rate = 1.0, std_dev = 1.0))
 
 
 # Helper function to calculate confidence intervals
@@ -160,7 +154,7 @@ confint_of_h_up <- function(
       sample_length = sample_length, std_dev = std_dev)
     hurst_up_estimates[i] <- flow_to_h_est_up(
       flow_increments = f, arrival_rate = arrival_rate,
-      std_dev = std_dev)$"h_up"
+      std_dev = std_dev, conflevel = conflevel)$"h_up"
     # hurst_up_estimates[i] <- flow_to_h_est_up(
     #   flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
     #   conflevel = conflevel)$"h_up"
@@ -180,7 +174,7 @@ confint_of_h_up <- function(
 
 # Compute mean of the confidence interval's upper value
 est_h_up_vector <- function(
-  sample_length, arrival_rate, hurst, std_dev, iterations) {
+  sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
   # old version with for-loop:
   # hurst_up_estimates <- rep(NA, iterations)
   # for (i in 1:iterations) {
@@ -202,7 +196,7 @@ est_h_up_vector <- function(
   flow_to_h_up <- function(flow_increments) {
     return(flow_to_h_est_up(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
-      std_dev = std_dev)$"h_up")
+      std_dev = std_dev, conflevel = conflevel)$"h_up")
   }
 
   flow_matrix <- sapply(1:iterations, build_flow_iter)
@@ -214,8 +208,8 @@ est_h_up_vector <- function(
 }
 
 
-# Helper function. Takes a vector of repeatedly estimated Hurst parameters and outputs
-# a conf.int
+# Helper function. Takes a vector of repeatedly estimated Hurst parameters
+# and outputs a conf.int
 compute_h_up_quantile = function(hVector, quantile_prob = 0.95) {
   hurst_up_means <- mean(hVector)
 
@@ -231,6 +225,7 @@ compute_h_up_quantile = function(hVector, quantile_prob = 0.95) {
 
 }
 
-h_ups <- est_h_up_vector(sample_length = 2 ** 10, arrival_rate = 1.0,
-                         hurst = 0.7, std_dev = 1.0, iterations = 100)
-print(compute_h_up_quantile(hVector = h_ups))
+# h_ups <- est_h_up_vector(sample_length = 2 ** 13, arrival_rate = 1.0,
+#                          hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
+#                          iterations = 100)
+# print(compute_h_up_quantile(hVector = h_ups))

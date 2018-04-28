@@ -21,10 +21,9 @@ generate_values_and_write_to_csv <- function(
   #   confint.conflevel = 0.95)
   
   # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
-  hvector <- interval_h_up_quantile(
+  hvector <- est_h_up_vector(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-    std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-    quantile_prob = 0.95, returnHvector = TRUE)
+    std_dev = std_dev, conflevel = conflevel, iterations = iterations)
   
   df = data.frame(bl_distribution = d, hvector = hvector)
   
@@ -156,17 +155,25 @@ plot_and_bound <- function(
   # return(list("SNC" = bound, "distribution" = d))
 }
 
+length_of_sample <- 2 ** 15
+rate_arrival <- 10 ** (-2)
+hurst_param <- 0.7
+n_time <- 200
+rate_server <- 1.5 * (10 ** (-2))
+sigma_std <- 1.0
+repetitions <- 200
+level_confidence <- 0.999
 
-# generate_values_and_write_to_csv(sample_length = 2 ** 15,
-#   arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
-#   server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0,
-#   conflevel = 0.999, iterations = 200)
+generate_values_and_write_to_csv(sample_length = length_of_sample,
+  arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
+  server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std,
+  conflevel = level_confidence, iterations = repetitions)
 
 q <- plot_and_bound(
- sample_length = 2 ** 15,
- arrival_rate = (10 ** (-2)), hurst = 0.7, time_n = 200,
- server_rate = 1.5 * (10 ** (-2)), std_dev = 1.0, splits = 20,
- conflevel = 0.999, iterations = 200)
+ sample_length = length_of_sample,
+ arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
+ server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std, splits = 20,
+ conflevel = level_confidence, iterations = repetitions)
 pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(q)

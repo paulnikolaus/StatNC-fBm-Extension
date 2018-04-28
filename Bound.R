@@ -172,12 +172,12 @@ inverse_bound <- function(time_n, std_dev, hurst,
 
 # print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
-#                     splits = 10, conflevel = 0.95, estimated_h = FALSE))
+#                     splits = 10, conflevel = 0.999, estimated_h = FALSE))
 # # result: 13.86328
-#
+# 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
-#                     splits = 10, conflevel = 0.995, estimated_h = TRUE))
+#                     splits = 10, conflevel = 0.999, estimated_h = TRUE))
 # # result: 15.38672

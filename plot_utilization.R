@@ -35,11 +35,15 @@ csv_backlog_vs_util <- function(
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = FALSE)
     print(paste0("snc_bound: ", snc_bound[i]))
+    
+    h_up_vec <- est_h_up_vector(
+      sample_length = sample_length, arrival_rate = arrival_rate,
+      hurst = hurst, std_dev = std_dev, conflevel = conflevel,
+      iterations = iterations
+    )
 
-    h_up_quantile <- interval_h_up_quantile(
-      sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-      std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-      quantile_prob = 0.95)
+    h_up_quantile <- compute_h_up_quantile(hVector = h_up_vec,
+                                           quantile_prob = 0.95)
     print(h_up_quantile)
 
     stat_mean[i] <- inverse_bound(
@@ -116,11 +120,11 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-# csv_backlog_vs_util(
-#   sample_length = 2 ** 16,
-#   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
-#   std_dev = 1.0, splits = 20, conflevel = 0.9999,
-#   iterations = 1500)
+csv_backlog_vs_util(
+  sample_length = 2 ** 17,
+  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
+  std_dev = 1.0, splits = 20, conflevel = 0.9999,
+  iterations = 100)
 
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
