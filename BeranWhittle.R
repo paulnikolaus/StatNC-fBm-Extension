@@ -69,7 +69,7 @@ CetaFGN <- function(eta) {
   M <- length(eta)
   # size of steps in Riemann sum: 2*pi/m
   m <- 10000
-  # trunc() is sort of rounding
+  # trunc(): integer part of (m-1)/2
   mhalfm <- trunc((m - 1) / 2)
   # size of delta for numerical calculation of derivative
   delta <- 0.000000001
