@@ -3,9 +3,34 @@
 
 library("ggplot2")
 
-source("simulation.R") # compute_distribution(), loads bound.R
+source("simulation.R") # compute_distribution()
 source("estimate_hurst.R") # loads the necessary tools for estimation
 source("Bound.R") # inverse_bound()
+
+generate_values_and_write_to_csv <- function(
+  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
+  conflevel = 0.999, iterations = 10 ** 2) {
+  d <- compute_distribution(
+    arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
+    time_n = time_n, server_rate = server_rate, std_dev = std_dev,
+    iterations = iterations)
+  
+  # h.confint <- confint_of_h_up(
+  #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
+  #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
+  #   confint.conflevel = 0.95)
+  
+  # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
+  hvector <- interval_h_up_quantile(
+    sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
+    std_dev = std_dev, conflevel = conflevel, iterations = iterations,
+    quantile_prob = 0.95, returnHvector = TRUE)
+  
+  df = data.frame(bl_distribution = d, hvector = hvector)
+  
+  write.csv(df, file = "backlog_dist_h_confint.csv",
+            col.names = TRUE, row.names = FALSE)
+}
 
 # Plots the empirical backlog distribution.
 
@@ -73,11 +98,11 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 plot_and_bound <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
   splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
-  
-  df = read.table(file = "backlog_dist_h_confint.csv", sep = ";", header=T)
-  
-  h.confint = compute_h_up_quantile(hVector = df$hvector)
-  
+
+  df <- read.csv(file = "backlog_dist_h_confint.csv", header = T)
+
+  h.confint <- compute_h_up_quantile(hVector = df$hvector)
+
   snc_bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
@@ -121,39 +146,15 @@ plot_and_bound <- function(
   print(paste0("stat_upper = ", stat_upper))
 
   plot_distribution(
-    computed_dist = df$bl_distribution, stat_mean = stat_mean, stat_lower = stat_lower,
-    stat_upper = stat_upper, trad = snc_bound, conflevel = conflevel)
+    computed_dist = df$bl_distribution, stat_mean = stat_mean,
+    stat_lower = stat_lower, stat_upper = stat_upper, trad = snc_bound,
+    conflevel = conflevel)
 
   # theme_set(theme_bw(base_size = 18))
   # qplot(x = 1:length(d), y = d) +
   # geom_line(aes(y = bound, color = "bound"))
   # return(list("SNC" = bound, "distribution" = d))
 }
-
-generate_values_and_write_to_csv = function(
-          sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-          conflevel = 0.999, iterations = 10 ** 2) {
-  d <- compute_distribution(
-    arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
-    time_n = time_n, server_rate = server_rate, std_dev = std_dev,
-    iterations = iterations)
-
-  # h.confint <- confint_of_h_up(
-  #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-  #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-  #   confint.conflevel = 0.95)
-  
-  # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
-  hvector <- interval_h_up_quantile(
-    sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-    std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-    quantile_prob = 0.95, returnHvector = TRUE)
-  
-  df = data.frame(bl_distribution = d, hvector = hvector)
-  
-  write.table(df, file = "backlog_dist_h_confint.csv", sep = ";", col.names = TRUE, row.names = FALSE)
-}
-
 
 
 # generate_values_and_write_to_csv(sample_length = 2 ** 15,
