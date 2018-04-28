@@ -225,9 +225,9 @@ interval_h_up_quantile <- function(
     .show_progress(i, iterations, "interval_h_up_quantile()")
   }
   hurst_up_means <- mean(hurst_up)
-  
+
   beta <- 1 - quantile_prob
-  
+
   if(returnHvector) {
     return(hurst_up)
   } else {
@@ -242,12 +242,12 @@ interval_h_up_quantile <- function(
 # a conf.int
 compute_h_up_quantile = function(hVector, quantile_prob = 0.95) {
   hurst_up_means <- mean(hVector)
-  
+
   beta <- 1 - quantile_prob
   return(list("Hurst_lower_quant" = quantile(hVector, beta / 2)[[1]],
               "Hurst_up_mean" = hurst_up_means,
               "Hurst_upper_quant" = quantile(hVector, 1 - beta / 2)[[1]]))
-  
+
   # h_confidenceInterval = ci_help(hVector)
   # return(list("Hurst_lower_quant" = h_confidenceInterval[[1]],
   #             "Hurst_up_mean" = hurst_up_means,
