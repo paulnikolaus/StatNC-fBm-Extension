@@ -35,7 +35,7 @@ csv_backlog_vs_util <- function(
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = FALSE)
     print(paste0("snc_bound: ", snc_bound[i]))
-    
+
     h_up_vec <- est_h_up_vector(
       sample_length = sample_length, arrival_rate = arrival_rate,
       hurst = hurst, std_dev = std_dev, conflevel = conflevel,
@@ -52,13 +52,13 @@ csv_backlog_vs_util <- function(
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
     print(paste0("stat_mean: ", stat_mean[i]))
-    
+
     stat_low[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_lower_quant",
       arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
-    
+
     stat_up[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_upper_quant",
@@ -100,7 +100,7 @@ plot_backlog_vs_util <- function() {
     scale_color_manual(
       values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
     scale_shape_manual(values = c(20, 19, 20, 18, 17)) +
-    
+
     geom_label(aes(x = 0.83, y = max(backlog_bounds_df[3]) * 0.9,
                    label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
@@ -109,7 +109,7 @@ plot_backlog_vs_util <- function() {
                fill = "white", size = 5) +
     geom_label(aes(x = 0.92, max(backlog_bounds_df[6]) * 0.35,
                    label = "Simulation"), fill = "white", size = 5) +
-    
+
     theme_set(theme_bw(base_size = 19)) +
     # theme(legend.position = c(0.25, 0.8),
     #       legend.background = element_rect(color = "black"),

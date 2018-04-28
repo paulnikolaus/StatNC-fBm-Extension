@@ -14,19 +14,19 @@ generate_values_and_write_to_csv <- function(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
     iterations = iterations)
-  
+
   # h.confint <- confint_of_h_up(
   #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
   #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
   #   confint.conflevel = 0.95)
-  
+
   # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
   hvector <- est_h_up_vector(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations)
-  
-  df = data.frame(bl_distribution = d, hvector = hvector)
-  
+
+  df <- data.frame(bl_distribution = d, hvector = hvector)
+
   write.csv(df, file = "backlog_dist_h_confint.csv",
             col.names = TRUE, row.names = FALSE)
 }

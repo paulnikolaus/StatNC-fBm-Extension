@@ -114,10 +114,30 @@ flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
 
 flow_to_h_est_up_alter <- function(flow_increments, arrival_rate, std_dev) {
   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
-  
+
   res <- GetFitFGN(z = fgn_traffic, ciQ = TRUE)
-  
+
   return(list("h_est" = res$"H", "h_up" = res$"ci"[2]))
+}
+
+flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev,
+                                  conflevel) {
+  # Kettani, Houssain, and John A. Gubner.
+  # "A novel approach to the estimation of the Hurst parameter in
+  # self-similar traffic." Local Computer Networks, 2002.
+  # Proceedings. LCN 2002. 27th Annual IEEE Conference on. IEEE, 2002.
+  sample_length <- length(flow_increments)
+  fgn_traffic <- (flow_increments - arrival_rate) / std_dev
+
+  rho_hat_vec <- acf(fgn_traffic, type = "correlation", plot = TRUE)
+  rho_hat <- rho_hat_vec$"acf"[2]
+  hurst_hat <- 0.5 * (1 + log2(1 + rho_hat))
+
+  alpha <- 1 - conflevel
+
+  return(list("h_est" = hurst_hat,
+              "h_up" = hurst_hat + qnorm(1 - alpha / 10) / sqrt(sample_length))
+         )
 }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
@@ -126,6 +146,9 @@ flow_to_h_est_up_alter <- function(flow_increments, arrival_rate, std_dev) {
 #                        std_dev = 1.0, conflevel = 0.95))
 # print(flow_to_h_est_up_alter(flow_increments = flow_example,
 #                              arrival_rate = 1.0, std_dev = 1.0))
+# print(flow_to_h_est_up_fast(flow_increments = flow_example,
+#                             arrival_rate = 1.0, std_dev = 1.0,
+#                             conflevel = 0.95))
 
 
 # Helper function to calculate confidence intervals
@@ -210,7 +233,7 @@ est_h_up_vector <- function(
 
 # Helper function. Takes a vector of repeatedly estimated Hurst parameters
 # and outputs a conf.int
-compute_h_up_quantile = function(hVector, quantile_prob = 0.95) {
+compute_h_up_quantile <- function(hVector, quantile_prob = 0.95) {
   hurst_up_means <- mean(hVector)
 
   beta <- 1 - quantile_prob
