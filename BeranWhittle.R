@@ -171,105 +171,106 @@ Qmin <- function (etatry) {
   drop(result)
 }
 
-#MMMMMMMMMMMMM # Main program #MMMMMMMMMMMMM
-# read data
-cat(" in which file are the data ?")
-filedata <- readline()
-cat(" total number of observations ?")
-nmax <- scan(n = 1)
-cat("first and last observation to be considered (istart, iend) ?")
-
-startend <- c(scan(n = 2)) # > we only look at
-istart <- startend[1] # observations
-iend <- startend[2] # istart,istart+1,...,end
-cat("into how many subseries do you divide the data ?")
-nloop <- scan(n = 1)
-n <- trunc((iend - istart + 1) / nloop)
-nhalfm <- trunc((n - 1) / 2)
-# choose model
-cat("model: fr.G.noise (1) or fractional ARIMA(p,d,q) (2)?")
-
-
-p <- 0
-q <- 0
-
-# imodel <- scan(n = 1)
+# #MMMMMMMMMMMMM # Main program #MMMMMMMMMMMMM
+# # read data
+# cat(" in which file are the data ?")
+# filedata <- readline()
+# cat(" total number of observations ?")
+# nmax <- scan(n = 1)
+# cat("first and last observation to be considered (istart, iend) ?")
+#
+# startend <- c(scan(n = 2)) # > we only look at
+# istart <- startend[1] # observations
+# iend <- startend[2] # istart,istart+1,...,end
+# cat("into how many subseries do you divide the data ?")
+# nloop <- scan(n = 1)
+# n <- trunc((iend - istart + 1) / nloop)
+# nhalfm <- trunc((n - 1) / 2)
+# # choose model
+# cat("model: fr.G.noise (1) or fractional ARIMA(p,d,q) (2)?")
+#
+#
 # p <- 0
 # q <- 0
-# if (imodel == 2) {
-#   cat(" order of AR ?") #
-#   p <- scan(n = 1) #
-#   cat("order of MA ?")
-#   q <- scan(n = 1)
+#
+# # imodel <- scan(n = 1)
+# # p <- 0
+# # q <- 0
+# # if (imodel == 2) {
+# #   cat(" order of AR ?") #
+# #   p <- scan(n = 1) #
+# #   cat("order of MA ?")
+# #   q <- scan(n = 1)
+# # }
+#
+# # initialize h
+# cat(" initial estimate of h=?")
+# h <- scan(n = 1)
+# eta <- c(h)
+# # initialize AR parameter
+# if (p > 0) {
+#   cat(" initial estimates of AR parameters=?")
+#   eta[2:(p + 1)] <- scan(n = -p)
 # }
-
-# initialize h
-cat(" initial estimate of h=?")
-h <- scan(n = 1)
-eta <- c(h)
-# initialize AR parameter
-if (p > 0) {
-  cat(" initial estimates of AR parameters=?")
-  eta[2:(p + 1)] <- scan(n = -p)
-}
-# initialize MA parameter
-if (q > 0) {
-  cat(" initial estimates of MA parameters=?")
-  eta[(p + 2):(p + q + 1)] <- scan(n = q)
-}
-M <- length(eta)
-# loop
-thetavector <- c()
-i0 <- istart
-for (iloop in (1:nloop)) {
-  h <- max(0.2, min(h, 0.9)) # avoid extreme initial values
-  eta[1] <- h
-  i1 <- i0 + n - 1
-  y <- c(scan(filedata, n = nmax))[i0:i1] # read only y[i0:i1]
-  # standardize data
-  vary <- var(y)
-  y <- (y - mean(y)) / sqrt(var(y))
-  # periodogram of data
-  yper <- per(y)[2:(nhalfm + 1)]
-  # find estimate
-  s <- 2 * (1.-h)
-  etatry <- eta
-  result <- nlmin(Qmin, etatry, xc.to1 = 0.0000001, init.step = s)
-  eta <- result$x
-  thetal <- Qeta(eta)$thetal
-  theta <- c(thetal, eta)
-  thetavector <- c(thetavector, theta)
-  # calculate goodness of fit statistic
-  Qresult <- Qeta(eta)
-  # output
-  M <- length(eta)
-
-  SD <- CetaFGN(eta)
-  SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
-
-  # if (imodel == 1) {
-  #   SD <- CetaFGN(eta)
-  #   SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
-  # } else {
-  #   SD <- CetaARIMA(eta, p, q)
-  #   SD <- matrix(SD, nco1 = M, nrow, M, byrow = T) / n
-  # }
-  Hlow <- eta[1] - 1.96 * sqrt(SD[1, 1])
-  Hup <- eta[1] + 1.96 * sqrt(SD[1, 1])
-  cat("theta=", theta, fill = T)
-  cat("H=", eta[1], fill = T)
-  cat("95%-C.I. for H: [", Hlow, ",", Hup, "]", fill = T)
-  etalow <- c()
-  etaup <- c()
-  for (i in (1:length(eta))){
-    etalow <- c(etalow, eta[i] - 1.96 * sqrt(SD[i, i]))
-    etaup <- c(etaup, eta[i] + 1.96 * sqrt(SD[i, i]))
-  }
-  cat("95%-C.I.:", fill = T)
-  print(cbind(etalow, etaup), fill = T)
-  cat("periodogram is in yper", fill = T)
-  fest <- QresultStheta1 * Qresult$fspec
-  cat(" spectral density is in fest", fill = T)
-  # next subseries
-  i0 <- i0 + n
-}
+# # initialize MA parameter
+# if (q > 0) {
+#   cat(" initial estimates of MA parameters=?")
+#   eta[(p + 2):(p + q + 1)] <- scan(n = q)
+# }
+# M <- length(eta)
+# # loop
+# thetavector <- c()
+# i0 <- istart
+# for (iloop in (1:nloop)) {
+#   h <- max(0.2, min(h, 0.9)) # avoid extreme initial values
+#   eta[1] <- h
+#   i1 <- i0 + n - 1
+#   y <- c(scan(filedata, n = nmax))[i0:i1] # read only y[i0:i1]
+#   # standardize data
+#   vary <- var(y)
+#   y <- (y - mean(y)) / sqrt(var(y))
+#   # periodogram of data
+#   yper <- per(y)[2:(nhalfm + 1)]
+#   # find estimate
+#   s <- 2 * (1.-h)
+#   etatry <- eta
+#   # nlmin not part of R. Use nlm() or nlminb() instead
+#   result <- nlmin(Qmin, etatry, xc.to1 = 0.0000001, init.step = s)
+#   eta <- result$x
+#   thetal <- Qeta(eta)$thetal
+#   theta <- c(thetal, eta)
+#   thetavector <- c(thetavector, theta)
+#   # calculate goodness of fit statistic
+#   Qresult <- Qeta(eta)
+#   # output
+#   M <- length(eta)
+#
+#   SD <- CetaFGN(eta)
+#   SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
+#
+#   # if (imodel == 1) {
+#   #   SD <- CetaFGN(eta)
+#   #   SD <- matrix(SD, ncol = M, nrow = M, byrow = T) / n
+#   # } else {
+#   #   SD <- CetaARIMA(eta, p, q)
+#   #   SD <- matrix(SD, ncol = M, nrow, M, byrow = T) / n
+#   # }
+#   Hlow <- eta[1] - 1.96 * sqrt(SD[1, 1])
+#   Hup <- eta[1] + 1.96 * sqrt(SD[1, 1])
+#   cat("theta=", theta, fill = T)
+#   cat("H=", eta[1], fill = T)
+#   cat("95%-C.I. for H: [", Hlow, ",", Hup, "]", fill = T)
+#   etalow <- c()
+#   etaup <- c()
+#   for (i in (1:length(eta))){
+#     etalow <- c(etalow, eta[i] - 1.96 * sqrt(SD[i, i]))
+#     etaup <- c(etaup, eta[i] + 1.96 * sqrt(SD[i, i]))
+#   }
+#   cat("95%-C.I.:", fill = T)
+#   print(cbind(etalow, etaup), fill = T)
+#   cat("periodogram is in yper", fill = T)
+#   fest <- QresultStheta1 * Qresult$fspec
+#   cat(" spectral density is in fest", fill = T)
+#   # next subseries
+#   i0 <- i0 + n
+# }

@@ -273,7 +273,7 @@ plot_and_bound <- function(
     conflevel = conflevel)
 }
 
-length_of_sample <- 2 ** 15
+length_of_sample <- 2 ** 16
 rate_arrival <- 10 ** (-2)
 hurst_param <- 0.7
 n_time <- 200

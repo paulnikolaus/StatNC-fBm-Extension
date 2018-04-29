@@ -69,15 +69,18 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 # conflevel = confidence level of the estimation
 # return: lower and upper confidence interval as a vector
 get_h_up <- function(sample_length, h_estimated, conflevel) {
-  N <- sample_length
+  n <- sample_length
 
-  D <- CetaFGN(eta = c(H = h_estimated))
-  V <- 2 * D  **  (-1)
+  SD <- CetaFGN(eta = h_estimated)
+  # SD <- matrix(SD, ncol = 1, nrow = 1, byrow = T) / n
+  SD <- SD / n
+
   alpha <- (1 - conflevel)
   # we use the one-sided confidence intervall as we are only worried about
   # underestimation
   # otherwise we have to use 1 - alpha / 2
-  h_up <- h_estimated + qnorm(1 - alpha) * sqrt(V / N)
+  # h_up <- h_estimated + qnorm(1 - alpha) * sqrt(SD[1, 1])
+  h_up <- h_estimated + qnorm(1 - alpha) * sqrt(SD)
 
   # confidence interval of hurst must be in (0, 1)
   # Estimated hurst parameter cannot be above 1 as this gives an error
@@ -91,8 +94,8 @@ get_h_up <- function(sample_length, h_estimated, conflevel) {
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # sample_length <- length(flow_example)
-# print(get_h_up_old(sample_length = sample_length,
-#                    h_estimated = 0.7, conflevel = 0.95))
+# print(get_h_up(sample_length = sample_length, h_estimated = 0.7,
+#                conflevel = 0.95))
 
 
 # Convenience function for estimation of h's confidence interval
