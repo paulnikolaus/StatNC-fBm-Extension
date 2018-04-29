@@ -122,15 +122,21 @@ Qeta <- function(eta) {
   cat("in function Qeta", fill = T)
   h <- eta[1]
   # spectrum at Fourier frequencies
-  if (imodel == 1) {
-    fspec <- fspecFGN(eta, n)
-    theta1 <- fspec$theta1
-    fspec <- fspec$fspec
-  } else {
-    fspec <- fspecARIMA(eta, p, q, n)
-    theta1 <- fspec$theta1
+
+  fspec <- fspecFGN(eta, n)
+  theta1 <- fspec$theta1
   fspec <- fspec$fspec
-  }
+
+  # if (imodel == 1) {
+  #   fspec <- fspecFGN(eta, n)
+  #   theta1 <- fspec$theta1
+  #   fspec <- fspec$fspec
+  # } else {
+  #   fspec <- fspecARIMA(eta, p, q, n)
+  #   theta1 <- fspec$theta1
+  #   fspec <- fspec$fspec
+  # }
+
   # Tn = A / (B ** 2)
   yf <- yper / fspec
   yfyf <- yf ** 2
@@ -183,15 +189,20 @@ nhalfm <- trunc((n - 1) / 2)
 # choose model
 cat("model: fr.G.noise (1) or fractional ARIMA(p,d,q) (2)?")
 
-imodel <- scan(n = 1)
+
 p <- 0
 q <- 0
-if (imodel == 2) {
-  cat(" order of AR ?") #
-  p <- scan(n = 1) #
-  cat("order of MA ?")
-  q <- scan(n = 1)
-}
+
+# imodel <- scan(n = 1)
+# p <- 0
+# q <- 0
+# if (imodel == 2) {
+#   cat(" order of AR ?") #
+#   p <- scan(n = 1) #
+#   cat("order of MA ?")
+#   q <- scan(n = 1)
+# }
+
 # initialize h
 cat(" initial estimate of h=?")
 h <- scan(n = 1)
@@ -232,13 +243,17 @@ for (iloop in (1:nloop)) {
   Qresult <- Qeta(eta)
   # output
   M <- length(eta)
-  if (imodel == 1) {
-    SD <- CetaFGN(eta)
-    SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
-  } else {
-    SD <- CetaARIMA(eta, p, q)
-    SD <- matrix(SD, nco1 = M, nrow, M, byrow = T) / n
-  }
+
+  SD <- CetaFGN(eta)
+  SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
+
+  # if (imodel == 1) {
+  #   SD <- CetaFGN(eta)
+  #   SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
+  # } else {
+  #   SD <- CetaARIMA(eta, p, q)
+  #   SD <- matrix(SD, nco1 = M, nrow, M, byrow = T) / n
+  # }
   Hlow <- eta[1] - 1.96 * sqrt(SD[1, 1])
   Hup <- eta[1] + 1.96 * sqrt(SD[1, 1])
   cat("theta=", theta, fill = T)
