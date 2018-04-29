@@ -280,7 +280,7 @@ n_time <- 200
 rate_server <- 1.5 * (10 ** (-2))
 sigma_std <- 1.0
 level_confidence <- 0.999
-repetitions <- 200
+repetitions <- 500
 
 generate_values_and_write_to_csv(
     sample_length = length_of_sample,
