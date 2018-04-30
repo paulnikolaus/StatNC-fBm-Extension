@@ -115,16 +115,18 @@ flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
   return(list("h_est" = h_estimated, "h_up" = h_up))
 }
 
-flow_to_h_est_up_alter <- function(flow_increments, arrival_rate, std_dev) {
+flow_to_h_est_up_get_fit <- function(flow_increments, arrival_rate, std_dev) {
+  # use of FGN-package
+
   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
   res <- GetFitFGN(z = fgn_traffic, ciQ = TRUE)
 
+  # we can only return an interval for the confidence level = 95%
   return(list("h_est" = res$"H", "h_up" = res$"ci"[2]))
 }
 
-flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev,
-                                  conflevel) {
+flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
   # Kettani, Houssain, and John A. Gubner.
   # "A novel approach to the estimation of the Hurst parameter in
   # self-similar traffic." Local Computer Networks, 2002.
@@ -136,19 +138,17 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev,
   rho_hat <- rho_hat_vec$"acf"[2]
   hurst_hat <- 0.5 * (1 + log2(1 + rho_hat))
 
-  alpha <- 1 - conflevel
-
+  # we can only return an interval for the confidence level = 95%
   return(list("h_est" = hurst_hat,
-              "h_up" = hurst_hat + qnorm(1 - alpha / 10) / sqrt(sample_length))
-         )
+              "h_up" = hurst_hat + 2.5 / sqrt(sample_length)))
 }
 
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 11, std_dev = 1.0)
 # print(flow_to_h_est_up(flow_increments = flow_example, arrival_rate = 1.0,
 #                        std_dev = 1.0, conflevel = 0.95))
-# print(flow_to_h_est_up_alter(flow_increments = flow_example,
-#                              arrival_rate = 1.0, std_dev = 1.0))
+# print(flow_to_h_est_up_get_fit(flow_increments = flow_example,
+#                                arrival_rate = 1.0, std_dev = 1.0))
 # print(flow_to_h_est_up_fast(flow_increments = flow_example,
 #                             arrival_rate = 1.0, std_dev = 1.0,
 #                             conflevel = 0.95))
@@ -207,9 +207,9 @@ est_h_up_vector <- function(
   #   f <- build_flow(
   #     arrival_rate = arrival_rate, hurst = hurst,
   #     sample_length = sample_length, std_dev = std_dev)
-  #   hurst_up_estimates[i] <- flow_to_h_confint(
+  #   hurst_up_estimates[i] <- flow_to_h_est_up(
   #     flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-  #     conflevel = conflevel)[3]
+  #     conflevel = conflevel)$"h_up"
   # }
 
   # added input parameter in order to use sapply()
@@ -228,7 +228,7 @@ est_h_up_vector <- function(
   flow_matrix <- sapply(1:iterations, build_flow_iter)
   # dim(flowmatrix) = sample_length  iterations
   hurst_up_estimates <- pbapply(flow_matrix, 2, flow_to_h_up)
-
+  # pbapply() = apply() with progress bar
 
   return(hurst_up_estimates)
 }
@@ -236,15 +236,15 @@ est_h_up_vector <- function(
 
 # Helper function. Takes a vector of repeatedly estimated Hurst parameters
 # and outputs a conf.int
-compute_h_up_quantile <- function(hVector, quantile_prob = 0.95) {
-  hurst_up_means <- mean(hVector)
+compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
+  hurst_up_means <- mean(h_vector)
 
   beta <- 1 - quantile_prob
-  return(list("Hurst_lower_quant" = quantile(hVector, beta / 2)[[1]],
+  return(list("Hurst_lower_quant" = quantile(h_vector, beta / 2)[[1]],
               "Hurst_up_mean" = hurst_up_means,
-              "Hurst_upper_quant" = quantile(hVector, 1 - beta / 2)[[1]]))
+              "Hurst_upper_quant" = quantile(h_vector, 1 - beta / 2)[[1]]))
 
-  # h_confidenceInterval = ci_help(hVector)
+  # h_confidenceInterval = ci_help(h_vector)
   # return(list("Hurst_lower_quant" = h_confidenceInterval[[1]],
   #             "Hurst_up_mean" = hurst_up_means,
   #             "Hurst_upper_quant" = h_confidenceInterval[[2]]))
@@ -254,4 +254,4 @@ compute_h_up_quantile <- function(hVector, quantile_prob = 0.95) {
 # h_ups <- est_h_up_vector(sample_length = 2 ** 13, arrival_rate = 1.0,
 #                          hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
 #                          iterations = 100)
-# print(compute_h_up_quantile(hVector = h_ups))
+# print(compute_h_up_quantile(h_vector = h_ups))

@@ -1,3 +1,5 @@
+##### plot__false_SNC.R #####
+
 # This file holds the necessary functions for plotting the "wrong"
 # behavior of normal StatNC.
 # To this end, we include the non-parametric estimator from the StatNC paper,
@@ -5,8 +7,7 @@
 
 library("ggplot2")
 
-source("simulation.R") # compute_distribution()
-source("Bound.R") # inverse_bound()
+source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
 
 # Estimate a lower bound on the distribution parameter lambda, for
 # exp. i.i.d. arrivals
@@ -59,7 +60,6 @@ statNC_inverse_backlog_theta <- function(
 }
 
 # optimizes the theta-dependent bound
-# Same as above
 # blimit: bandwidth limitation used for estimation of emgf
 statNC_optimize_ibl_theta <- function(viol_prob, t_time, conflevel, emgf,
                                       server_rate, blimit, accurate = FALSE) {
@@ -159,7 +159,7 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   len <- length(computed_dist)
   maximum <- max(computed_dist)
 
-  # Build the x axis, start with 0 and end with the maximum
+  # Build the x-axis, start with 0 and end with the maximum
   bl <- seq(0, maximum, maximum / gran)
   # The cumulative backlog distribution curve
   # Init with 0
@@ -240,7 +240,7 @@ plot_and_bound <- function(
 
   df_statnormal <- read.csv(file = "backlog_dist_h_confint.csv", header = TRUE)
 
-  h.confint <- compute_h_up_quantile(hVector = df_statnormal$hvector)
+  h.confint <- compute_h_up_quantile(h_vector = df_statnormal$hvector)
 
   stat_mean <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_up_mean",

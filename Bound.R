@@ -9,7 +9,7 @@ source("simulation.R")
 # Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
 # (without any statistical operations)
 # time_n = Point in time
-# x = backog
+# x = backlog
 # std_dev = standard deviation,
 # hurst = Hurst Parameter
 # server_rate = Server Rate, also denoted C in formulas,

@@ -4,9 +4,7 @@
 library("reshape2")  # melt
 library("ggplot2")
 
-source("simulation.R") # compute_distribution(), loads bound.R
-source("estimate_hurst.R") # loads the necessary tools for estimation
-source("Bound.R") # inverse_bound()
+source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
 
 # Plots the the bound against the utilization.
 
@@ -42,7 +40,7 @@ csv_backlog_vs_util <- function(
       iterations = iterations
     )
 
-    h_up_quantile <- compute_h_up_quantile(hVector = h_up_vec,
+    h_up_quantile <- compute_h_up_quantile(h_vector = h_up_vec,
                                            quantile_prob = 0.95)
     print(h_up_quantile)
 
