@@ -34,7 +34,7 @@ generate_values_and_write_to_csv <- function(
 # Plots the empirical backlog distribution.
 
 plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
-                              trad, conflevel, gran = 1000) {
+                              trad, conflevel, iterations, gran = 1000) {
   theme_set(theme_bw(base_size = 18))
   len <- length(computed_dist)
   maximum <- max(computed_dist)
@@ -54,8 +54,8 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     pz[j] <- length(computed_dist[computed_dist <= i]) / len
     j <- j + 1
   }
-  # 99,99% percentile
-  nnb <- bl[min(which(pz >= conflevel))]
+  # need violation probability, not confidence level
+  nnb <- bl[min(which(pz >= 1 - (1 / iterations)))]
 
   frame <- data.frame(backlog = bl, perc = pz)
   # Prepare plot and plot backlog, trad and stat lines,
@@ -147,7 +147,7 @@ plot_and_bound <- function(
   plot_distribution(
     computed_dist = df$bl_distribution, stat_mean = stat_mean,
     stat_lower = stat_lower, stat_upper = stat_upper, trad = snc_bound,
-    conflevel = conflevel)
+    conflevel = conflevel, iterations = iterations)
 
   # theme_set(theme_bw(base_size = 18))
   # qplot(x = 1:length(d), y = d) +

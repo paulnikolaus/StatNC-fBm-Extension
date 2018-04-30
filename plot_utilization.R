@@ -13,7 +13,7 @@ source("Bound.R") # inverse_bound()
 csv_backlog_vs_util <- function(
   sample_length, arrival_rate, hurst, time_n, std_dev = 1.0,
   splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
-  utilizations <- (13:19) / 20
+  utilizations <- (14:19) / 20
 
   simulated_backlog <- rep(NA, length(utilizations))
   snc_bound <- rep(NA, length(utilizations))
@@ -27,7 +27,7 @@ csv_backlog_vs_util <- function(
     simulated_backlog[i] <- quantile((compute_distribution(
       arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
       time_n = time_n, server_rate = 1 / util, std_dev = std_dev,
-      iterations = iterations)), probs = conflevel)
+      iterations = iterations)), probs = 1 - (1 / iterations))
     print(paste0("simulated_backlog: ", simulated_backlog[i]))
 
     snc_bound[i] <- inverse_bound(
@@ -122,11 +122,11 @@ plot_backlog_vs_util <- function() {
   return(p)
 }
 
-csv_backlog_vs_util(
-  sample_length = 2 ** 16,
-  arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
-  std_dev = 1.0, splits = 20, conflevel = 0.999,
-  iterations = 500)
+# csv_backlog_vs_util(
+#   sample_length = 2 ** 16,
+#   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200,
+#   std_dev = 1.0, splits = 20, conflevel = 0.999,
+#   iterations = 500)
 
 pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
