@@ -198,14 +198,14 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     geom_vline(xintercept = c(stat_upper), colour = "aquamarine4",
                linetype = "dotted") +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
-    geom_label(aes(x = stat_fail_lower - 0.45 * maximum, y = 0.3,
+    geom_label(aes(x = stat_fail_lower - 0.42 * maximum, y = 0.3,
                    label = "StatNC (IID)"), fill = "white", size = 5) +
-    geom_label(aes(x = stat_fail_lower - 0.42 * maximum, y = 0.7,
+    geom_label(aes(x = stat_fail_lower - 0.30 * maximum, y = 0.7,
                    label = "StatNC (LRD)"), fill = "white", size = 5) +
-    geom_segment(aes(x = stat_fail_lower - 0.37 * maximum, y = 0.3,
+    geom_segment(aes(x = stat_fail_lower - 0.31 * maximum, y = 0.3,
                      xend = stat_fail_mean, yend = 0.3),
                  size = 0.4, arrow = NULL) +
-    geom_segment(aes(x = stat_fail_lower - 0.28 * maximum, y = 0.7,
+    geom_segment(aes(x = stat_fail_lower - 0.03 * maximum, y = 0.7,
                      xend = stat_mean, yend = 0.7),
                  size = 0.4, arrow = NULL) +
     scale_x_log10() +
@@ -282,11 +282,11 @@ sigma_std <- 1.0
 level_confidence <- 0.999
 repetitions <- 500
 
-generate_values_and_write_to_csv(
-    sample_length = length_of_sample,
-    arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
-    server_rate = rate_server, std_dev = sigma_std,
-    conflevel = level_confidence, iterations = repetitions)
+# generate_values_and_write_to_csv(
+#     sample_length = length_of_sample,
+#     arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
+#     server_rate = rate_server, std_dev = sigma_std,
+#     conflevel = level_confidence, iterations = repetitions)
 
 q <- plot_and_bound(
   sample_length = length_of_sample,
