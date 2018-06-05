@@ -3,7 +3,9 @@
 
 library("ggplot2")
 
-source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
+source("simulation.R") # compute_distribution()
+source("estimate_hurst.R") # loads the necessary tools for estimation
+source("Bound.R") # inverse_bound()
 
 generate_values_and_write_to_csv <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
@@ -36,7 +38,7 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
   len <- length(computed_dist)
   maximum <- max(computed_dist)
 
-  # Build the x-axis, start with 0 and end with the maximum
+  # Build the x axis, start with 0 and end with the maximum
   bl <- seq(0, maximum, maximum / gran)
   # The cumulative backlog distribution curve
   # Init with 0
@@ -176,7 +178,7 @@ pdf("backlog_distribution.pdf", width = 8, height = 5)
 print(q)
 
 # results:
-# SNC-bound: 172
-# StatNC-bound: 190
+# SNC-bound: 164.0
+# StatNC-bound: 204.5
 
 dev.off()

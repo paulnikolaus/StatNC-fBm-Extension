@@ -224,9 +224,24 @@ est_h_up_vector <- function(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
       std_dev = std_dev, conflevel = conflevel)$"h_up")
   }
+  
+  # flow_to_h_est <- function(flow_increments) {
+  #   return(flow_to_h_est_up(
+  #     flow_increments = flow_increments, arrival_rate = arrival_rate,
+  #     std_dev = std_dev, conflevel = conflevel)$"h_est")
+  # }
 
   flow_matrix <- sapply(1:iterations, build_flow_iter)
   # dim(flowmatrix) = sample_length  iterations
+  
+  # print("hurst_estimates")
+  # print(mean(pbapply(flow_matrix, 2, flow_to_h_est)))
+  # result: 0.7032785
+  
+  # print("hurst_up_estimates")
+  # print(mean(pbapply(flow_matrix, 2, flow_to_h_up)))
+  # result: 0.7112128
+  
   hurst_up_estimates <- pbapply(flow_matrix, 2, flow_to_h_up)
   # pbapply() = apply() with progress bar
 
