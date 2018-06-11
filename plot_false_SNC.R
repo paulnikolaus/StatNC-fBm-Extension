@@ -9,11 +9,11 @@ library("ggplot2")
 
 source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
 
-# Estimate a lower bound on the distribution parameter lambda, for
-# exp. i.i.d. arrivals
-# arrivals: the arrivals whose parameter is estimated
-# (increments not cumulative)
-# conflevel: confidence level of the estimator
+#' Estimate a lower bound on the distribution parameter lambda, for
+#' exp. i.i.d. arrivals
+#' @param  arrivals the arrivals whose parameter is estimated
+#' (increments not cumulative).
+#' @param conflevel confidence level of the estimator.
 
 exp_traffic_estimator <- function(arrivals, conflevel) {
   num_samples <- length(arrivals)
@@ -23,12 +23,12 @@ exp_traffic_estimator <- function(arrivals, conflevel) {
   # = lambda_min
 }
 
-# Non parametric estimator, returns the estimated mgf, M_ is bandwidth
-# limitation on traffic increments
-# arrivals: the arrivals whose parameter is estimated
-# (increments not cumulative)
-# conflevel: confidence level of the estimator
-# blimit: bandwidth limitation
+#' Non parametric estimator, returns the estimated mgf, M_ is bandwidth
+#' limitation on traffic increments
+#' @param arrivals the arrivals whose parameter is estimated
+#' (increments not cumulative).
+#' @param conflevel confidence level of the estimator.
+#' @param blimit bandwidth limitation.
 
 nonparametric_estimator <- function(arrivals, conflevel, blimit) {
   num_samples <- length(arrivals)
@@ -39,15 +39,15 @@ nonparametric_estimator <- function(arrivals, conflevel, blimit) {
       exp(t * blimit) - 1)) ** (n - m))
 }
 
-# Theta-dependent inverse backlog bound. Gets an estimated mgf and
-# outputs a backlog bound.
-# Has to be optimizedin theta. NOTE: Actual Viol. Prob is p - alpha
-# viol_prob: target violation probaility
-# t_time: point in time which should be evaluated
-# conflevel: confidence level of the estimator (\alpha in the paper)
-# emgf: the estimated mgf
-# server_rate: constant rate of the server
-# theta: free variable of every mgf, has to be optimized later
+#' Theta-dependent inverse backlog bound. Gets an estimated mgf and
+#' outputs a backlog bound.
+#' Has to be optimizedin theta. NOTE: Actual Viol. Prob is p - alpha
+#' @param viol_prob target violation probaility.
+#' @param t_time point in time which should be evaluated.
+#' @param conflevel confidence level of the estimator (alpha in the paper).
+#' @param emgf the estimated mgf.
+#' @param server_rate constant rate of the server.
+#' @param theta free variable of every mgf, has to be optimized later.
 statNC_inverse_backlog_theta <- function(
   viol_prob, t_time, conflevel, emgf, server_rate, theta) {
   if (viol_prob <= 1 - conflevel) {
@@ -59,8 +59,8 @@ statNC_inverse_backlog_theta <- function(
   return((log(tmp_sum) - log(viol_prob - 1 + conflevel)) / theta)
 }
 
-# optimizes the theta-dependent bound
-# blimit: bandwidth limitation used for estimation of emgf
+#' optimizes the theta-dependent bound
+#' @param blimit bandwidth limitation used for estimation of emgf.
 statNC_optimize_ibl_theta <- function(viol_prob, t_time, conflevel, emgf,
                                       server_rate, blimit, accurate = FALSE) {
 
@@ -77,10 +77,9 @@ statNC_optimize_ibl_theta <- function(viol_prob, t_time, conflevel, emgf,
   return(min(backlog_vector, na.rm = TRUE))
 }
 
-# Compute an alternative interval for h_p
-# conflevel: confidence level of hurst estimation
-# conflevel_beta: compute another h_up for a higher confidence level
-
+#' Compute an alternative interval for h_p
+#' @param conflevel confidence level of hurst estimation
+#' @param conflevel_beta compute another h_up for a higher confidence level.
 statNC_interval <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
   viol_prob, t_time, server_rate, quantile_prob = 0.95,

@@ -15,11 +15,6 @@ generate_values_csv <- function(
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
     iterations = iterations)
 
-  # h.confint <- confint_of_h_up(
-  #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-  #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-  #   confint.conflevel = 0.95)
-
   hvector <- est_h_up_vector(
     sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
     std_dev = std_dev, conflevel = conflevel, iterations = iterations)
