@@ -96,7 +96,7 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 plot_and_bound <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
   splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
-  
+
   if ((1 / iterations) < (1 - conflevel)) {
     stop(paste0("p = ", (1 / iterations), " < (1 - conflevel) = ",
                 1 - conflevel, ". \n

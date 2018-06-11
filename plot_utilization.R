@@ -12,7 +12,7 @@ csv_backlog_vs_util <- function(
   sample_length, arrival_rate, hurst, time_n, std_dev = 1.0,
   splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
   utilizations <- (14:19) / 20
-  
+
   if ((1 / iterations) < (1 - conflevel)) {
     stop(paste0("p = ", (1 / iterations), " < (1 - conflevel) = ",
       1 - conflevel, ". \n
