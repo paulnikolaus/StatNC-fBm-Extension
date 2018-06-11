@@ -33,7 +33,7 @@ estimate_random_data <- function(estimator_fun) {
 
 get_execution_time <- function(fgn_data, estimator_fun, iterations = 100) {
   print(estimator_fun(x = fgn_data)@method)
-  data <- foreach(i = 1:iterations, .combine = 'c') %do% {
+  data <- foreach(i = 1:iterations, .combine = "c") %do% {
     system.time(estimate_random_data(estimator_fun))[3]
   }
 
@@ -54,7 +54,7 @@ print(get_execution_time(fgn_data = fgn_sample, estimator_fun = perFit))
 
 mean_and_var_estimate <- function(fgn_data, estimator_fun, iterations = 100) {
   print(estimator_fun(x = fgn_data)@method)
-  data <- foreach(i = 1:iterations, .combine = 'c') %do% {
+  data <- foreach(i = 1:iterations, .combine = "c") %do% {
     estimate_random_data(estimator_fun)
   }
 

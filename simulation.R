@@ -9,14 +9,14 @@ library("ggplot2")
 
 source("BeranWhittle.R") # CetaFGN()
 
-# Build a fBm flow following the Kelly model.
-# First a cumulative FBM flow is built and then divided into FGN increments
-# which are easier to use in the SNC setting
-# rate = constant arrival rate
-# sample_length = point in time until which the traffic
-#                 should be generated
-# std_dev = standard_deviation.
-
+#' Build a fBm flow following the Kelly model.
+#' First a cumulative FBM flow is built and then divided into FGN increments
+#' that are easier to use in the SNC setting
+#' @param rate constant arrival rate.
+#' @param sample_length point in time until which the traffic
+#'                      should be generated.
+#' @param std_dev standard_deviation.
+#' @return sample path of flow increments.
 build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
   # Previously:
   # cumuflow <- rep(NA, sample_length)
@@ -53,35 +53,14 @@ build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
   return(flow_increments)
 }
 
+#' @example
 # print(build_flow(arrival_rate = 1.0, hurst = 0.7, n = 2 ** 12,
 #                  std_dev = 1.0))
 
 
-# Given a flow and a constant rate for the server, compute the backlog at
-# each point in time
-# Flow = FGN Arrival Flow, server_rate = constant Server rate, n=point in time
-# until which the backlog should be simulated
-
-# simulate_system <- function(flow_increments, server_rate, time_n) {
-#   backlog <- rep(NA, time_n)
-#   backlog[1] <- 0
-#   for (i in 2:time_n) {
-#     # Lindley's equation:
-#     backlog[i] <- max(backlog[i - 1] + flow_increments[i - 1] - server_rate, 0)
-#   }
-#   return(backlog)
-# }
-
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 12, std_dev = 1.0)
-# print(simulate_system(flow_increments = flow_example, server_rate = 2.0,
-#                       time_n = 2 ** 12))
-
-
-# Computes the empricial backlog distribution for a specific point in time
-# for FGN arrivals with mean arrival rate, Hurst parameter hurst and
-# standard deviation std_dev at a server with the given server rate
-
+#' Computes the empricial backlog distribution for a specific point in time
+#' for FGN arrivals with mean arrival rate, Hurst parameter hurst and
+#' standard deviation std_dev at a server with the given server rate
 compute_distribution <- function(
   arrival_rate, hurst, sample_length, time_n, server_rate, std_dev = 1.0,
   iterations = 10 ** 3) {
@@ -103,6 +82,7 @@ compute_distribution <- function(
   return(backlogs)
 }
 
+#' @example 
 # print(compute_distribution(
 #   arrival_rate = 1.0, hurst = 0.7, sample_length = 10 ** 4,
 #   time_n = 10 ** 4, server_rate = 2.0, std_dev = 1.0,

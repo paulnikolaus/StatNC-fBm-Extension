@@ -171,6 +171,7 @@ Qmin <- function (etatry) {
   drop(result)
 }
 
+#' @example
 # #MMMMMMMMMMMMM # Main program #MMMMMMMMMMMMM
 # # read data
 # cat(" in which file are the data ?")

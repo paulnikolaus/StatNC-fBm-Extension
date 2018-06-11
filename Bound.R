@@ -6,15 +6,17 @@ library("dvfBm")
 source("estimate_hurst.R")
 source("simulation.R")
 
-# Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
-# (without any statistical operations)
-# time_n = Point in time
-# x = backlog
-# std_dev = standard deviation,
-# hurst = Hurst Parameter
-# server_rate = Server Rate, also denoted C in formulas,
-# arrival_rate = constant rate from the arrival model, also denoted as \lambda
-# tau = discretization parameter > 0
+#' Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
+#' (without any statistical operations)
+#' @param time_n Point in time.
+#' @param x backlog.
+#' @param std_dev standard deviation.
+#' @param hurst Hurst Parameter.
+#' @param server_rate Server Rate, also denoted C in formulas.
+#' @param arrival_rate constant rate from the arrival model, also
+#' denoted as lambda
+#' @param tau discretization parameter > 0.
+#' @return backlog violation probability.
 backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
                           arrival_rate, tau = 0.9) {
   # TODO: Better default value for tau
@@ -37,6 +39,7 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   return(backlog)
 }
 
+#' @examples
 # print("backlog bound:")
 # print(backlog_bound(time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
 #                     server_rate = 1.0, arrival_rate = 0.6, tau = 1.0))
@@ -62,16 +65,16 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 # }
 
 
-# Computes the statistical backlog bound based on the FGN increments
-# (Statistical version of theorem 3.1)
-# time_n = Point in Time
-# x = Backlog
-# std_dev = standard deviation
-# hurst = the estimated hurst parameter
-# server_rate = Server Rate, also denoted C
-# arrival_rate = constant arrival rate, also denoted \lambda
-# conflevel = confidence level of estimation
-
+#' Computes the statistical backlog bound based on the FGN increments
+#' (Statistical version of theorem 3.1)
+#' @param time_n Point in Time.
+#' @param x Backlog.
+#' @param std_dev standard deviation.
+#' @param hurst the estimated hurst parameter.
+#' @param server_rate Server Rate, also denoted C.
+#' @param arrival_rate constant arrival rate, also denoted as lambda.
+#' @param conflevel confidence level of estimation.
+#' @return StatNC backlog violation probability.
 stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
                                arrival_rate, conflevel = 0.95) {
   if (server_rate < arrival_rate) {
@@ -87,22 +90,24 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   return(backlog_stat)
 }
 
+#' @example
 # print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst = 0.7,
 #                          server_rate = 1.0, arrival_rate = 0.6,
 #                          conflevel = 0.95))
 
 
-# Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
-# last parameter indicates whether SNC or stat_nc bound should be used
-# time_n = Point in time
-# p = violation probability
-# std_dev = standard deviation
-# hurst = Hurst parameter
-# server_rate = Server Rate, also known as C in formulas
-# arrival_rate = constant rate from the arrival model, also denoted \lambda
-# splits = number of iterations for binary search
-# conflevel = confidence level if estimation was used
-
+#' Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
+#' last parameter indicates whether SNC or stat_nc bound should be used
+#' @param time_n Point in time.
+#' @param p violation probability.
+#' @param std_dev standard deviation.
+#' @param hurst Hurst parameter.
+#' @param server_rate Server Rate, also known as C in formulas.
+#' @param arrival_rate constant rate from the arrival model, also
+#' denoted as lambda.
+#' @param splits number of iterations for binary search.
+#' @param conflevel confidence level if estimation was used.
+#' @return backlog bound for a given probability.
 inverse_bound <- function(time_n, std_dev, hurst,
                           arrival_rate, server_rate, p = 10  **  (-3),
                           splits = 10, conflevel = 0.95,
@@ -170,6 +175,7 @@ inverse_bound <- function(time_n, std_dev, hurst,
   return(max(0, backlog))
 }
 
+#' @examples 
 # print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
 #                     splits = 10, conflevel = 0.999, estimated_h = FALSE))

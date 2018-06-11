@@ -3,8 +3,9 @@
 library("fArma")
 library("foreach")
 
-# Comparison of the fBm simulations in the fArma package
-
+#' Comparison of the fBm simulations in the fArma package
+#' @param method String for the method in fArma package.
+#' @return String of description.
 method_to_description <- function(method) {
   if (method == "mvn") {
       return("Numerical approximation of the stochastic integral")

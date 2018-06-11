@@ -128,7 +128,7 @@ compute_statnc_interval <- function(inverse_backlog, quantile_prob = 0.95) {
               "ibl_upper" = upper))
 }
 
-generate_values_and_write_to_csv <- function(
+generate_values_csv <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
   conflevel = 0.999, iterations = 10 ** 2) {
 
@@ -282,7 +282,7 @@ sigma_std <- 1.0
 level_confidence <- 0.999
 repetitions <- 500
 
-# generate_values_and_write_to_csv(
+# generate_values_csv(
 #     sample_length = length_of_sample,
 #     arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
 #     server_rate = rate_server, std_dev = sigma_std,

@@ -7,21 +7,21 @@ library("pbapply")
 source("BeranWhittle.R")
 source("simulation.R")
 
-# Estimates the Hurst parameter of the given traffic
-# (we assume Kelly's traffic model)
-# with periodograms
-# Rose: In most cases, this (i.e., periodogram based estimator)
-# will lead to a wrong estimate of H
-# -> better to use other estimator
-
+#'Estimates the Hurst parameter of the given traffic
+#'(we assume Kelly's traffic model) with periodograms
+#' Rose: In most cases, this (i.e., periodogram based estimator)
+#' will lead to a wrong estimate of H
+#' -> better to use other estimator
+# 
 # Helper function for periodogram based estimation
 # use_only_first_part <- function(input_vector, share) {
 #   return(input_vector[1:(round(length(input_vector) * share))])
 # }
 
-# flow_increments = flow_increments
-# arrival_rate = constant rate of the flow, also denoted \lambda
-# std_dev = standard deviation
+#' @param flow_increments flow increments.
+#' @param arrival_rate constant rate of the flow, also denoted lambda.
+#' @param std_dev standard deviation, also denoted as sigma.
+#' @return estimated hurst parameter.
 estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
    # Extract the gaussian noise from flow increments
    fgn_traffic <- (flow_increments - arrival_rate) / std_dev
@@ -56,18 +56,20 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   return(h_estimated)
 }
 
+#' @examples
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 14, std_dev = 1.0)
 # print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
 #                      std_dev = 1.0))
 
 
-# Gives the confidence interval for the Hurst estimator
-# using the periodogram approach in Rose
-# amount_increments = length of the fbm_traffic vector
-# h_estimated = estimated value of h
-# conflevel = confidence level of the estimation
-# return: lower and upper confidence interval as a vector
+#' Gives the confidence interval for the Hurst estimator
+#' using the periodogram approach in Rose
+#'
+#' @param amount_increments length of the fbm_traffic vector.
+#' @param h_estimated estimated value of h.
+#' @param conflevel confidence level of the estimation.
+#' @return lower and upper confidence interval as a vector.
 get_h_up <- function(sample_length, h_estimated, conflevel) {
   n <- sample_length
 
@@ -91,6 +93,7 @@ get_h_up <- function(sample_length, h_estimated, conflevel) {
   return(h_up)
 }
 
+#' @examples
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
 # sample_length <- length(flow_example)
@@ -98,11 +101,12 @@ get_h_up <- function(sample_length, h_estimated, conflevel) {
 #                conflevel = 0.95))
 
 
-# Convenience function for estimation of h's confidence interval
-# flow_increments = output of build_flow()
-# arrival_rate = arrival_rate used in the traffic model
-# std_dev = std_dev of flow
-# return: lower CI, estimated value, and upper CI as a vector
+#' Convenience function for estimation of h's confidence interval
+#'
+#' @param flow_increments output of build_flow().
+#' @param arrival_rate = arrival_rate used in the traffic model.
+#' @param std_dev = std_dev of flow.
+#' @return lower CI, estimated value, and upper CI as a vector.
 flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
                                  conflevel) {
   sample_length <- length(flow_increments)
@@ -143,6 +147,7 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
               "h_up" = hurst_hat + 2.5 / sqrt(sample_length)))
 }
 
+#' @examples
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 11, std_dev = 1.0)
 # print(flow_to_h_est_up(flow_increments = flow_example, arrival_rate = 1.0,
@@ -198,7 +203,8 @@ confint_of_h_up <- function(
 #   conflevel = 0.999, iterations = 10 ** 2, confint.conflevel = 0.999))
 
 
-# Compute mean of the confidence interval's upper value
+#' Compute mean of the confidence interval's upper value
+#' @return vector of estimated h_up's.
 est_h_up_vector <- function(
   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
   # old version with for-loop:
@@ -249,8 +255,9 @@ est_h_up_vector <- function(
 }
 
 
-# Helper function. Takes a vector of repeatedly estimated Hurst parameters
-# and outputs a conf.int
+#' Helper function. Takes a vector of repeatedly estimated Hurst parameters
+#' and returns the lower and upper quantile.
+#' @return lower quantile of h_ups, mean of h_up, upper quantile of h_up
 compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
   hurst_up_means <- mean(h_vector)
 
@@ -266,6 +273,7 @@ compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
 
 }
 
+#' @examples 
 # h_ups <- est_h_up_vector(sample_length = 2 ** 13, arrival_rate = 1.0,
 #                          hurst = 0.7, std_dev = 1.0, conflevel = 0.999,
 #                          iterations = 100)

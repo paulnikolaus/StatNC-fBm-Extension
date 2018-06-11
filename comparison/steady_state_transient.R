@@ -1,14 +1,16 @@
-##### steady-state_transient.R #####
+##### steady_state_transient.R #####
 
-# Computes the plain (not discretized) SNC Bound from Theorem 3.5,
-# Equation (3.10)
-# (without any statistical operations)
-# time_n = Point in time
-# x = backog
-# std_dev = standard deviation,
-# hurst = Hurst Parameter
-# server_rate = Server Rate, also denoted C in formulas,
-# arrival_rate = constant rate from the arrival model, also denoted as \lambda
+#' Computes the plain (not discretized) SNC Bound from Theorem 3.5,
+#' Equation (3.10)
+#' (without any statistical operations)
+#' @param time_n Point in time.
+#' @param x backog.
+#' @param std_dev standard deviation.
+#' @param hurst Hurst Parameter.
+#' @param server_rate Server Rate, also denoted C in formulas.
+#' @param arrival_rate constant rate from the arrival model, also
+#' denoted as lambda
+#' @return probability backlog bound for transient state
 backlog_bound_transient <- function(time_n, x, std_dev, hurst, server_rate,
                                     arrival_rate) {
   if (server_rate <= arrival_rate) {
@@ -35,6 +37,7 @@ backlog_bound_steady <- function(std_dev, hurst, server_rate, arrival_rate) {
   return(numerator / denominator)
 }
 
+#' @examples 
 sigma <- 1.0
 h <- 0.7
 C <- 3.0
