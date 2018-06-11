@@ -7,7 +7,7 @@ library("dvfBm")
 # Best plots EU
 library("ggplot2")
 
-source("BeranWhittle.R") # CetaFGN()
+source("BeranWhittle.R") #' CetaFGN()
 
 #' Build a fBm flow following the Kelly model.
 #' First a cumulative FBM flow is built and then divided into FGN increments
@@ -19,20 +19,18 @@ source("BeranWhittle.R") # CetaFGN()
 #' @return sample path of flow increments.
 build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
   # Previously:
-  # cumuflow <- rep(NA, sample_length)
-  # flow <- rep(NA, sample_length)
-  # fbm <- circFBM(n, hurst, plotfBm = FALSE)
-  # for (t in 1:n) {
-  #   cumuflow[t] <- arrival_rate * t + std_dev * fbm[t]
-  #
-  #   if (t >= 2) {
-  #     flow[t] <- cumuflow[t] - cumuflow[t - 1]
-  #   } else {
-  #     flow[t] <- cumuflow[t]
-  #   }
-  # }
-  #
-  # return(flow)
+  #' cumuflow <- rep(NA, sample_length)
+  #' flow <- rep(NA, sample_length)
+  #' fbm <- circFBM(n, hurst, plotfBm = FALSE)
+  #' for (t in 1:n) {
+  #'   cumuflow[t] <- arrival_rate * t + std_dev * fbm[t]
+  #'   if (t >= 2) {
+  #'     flow[t] <- cumuflow[t] - cumuflow[t - 1]
+  #'   } else {
+  #'     flow[t] <- cumuflow[t]
+  #'   }
+  #' }
+  #' return(flow)
 
   # changed fbm to fbm * (sample_length ** hurst) as the package documentations
   # says that fbm is otherwise only created in the interval
@@ -82,7 +80,7 @@ compute_distribution <- function(
   return(backlogs)
 }
 
-#' @example 
+#' @example
 # print(compute_distribution(
 #   arrival_rate = 1.0, hurst = 0.7, sample_length = 10 ** 4,
 #   time_n = 10 ** 4, server_rate = 2.0, std_dev = 1.0,

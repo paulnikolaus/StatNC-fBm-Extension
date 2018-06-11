@@ -3,9 +3,9 @@
 
 library("ggplot2")
 
-source("simulation.R") # compute_distribution()
+source("simulation.R") #' loads compute_distribution()
 source("estimate_hurst.R") # loads the necessary tools for estimation
-source("Bound.R") # inverse_bound()
+source("Bound.R") #' loads inverse_bound()
 
 generate_values_csv <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
@@ -138,10 +138,10 @@ plot_and_bound <- function(
     stat_lower = stat_lower, stat_upper = stat_upper, trad = snc_bound,
     conflevel = conflevel, iterations = iterations)
 
-  # theme_set(theme_bw(base_size = 18))
-  # qplot(x = 1:length(d), y = d) +
-  # geom_line(aes(y = bound, color = "bound"))
-  # return(list("SNC" = bound, "distribution" = d))
+  #' theme_set(theme_bw(base_size = 18))
+  #' qplot(x = 1:length(d), y = d) +
+  #' geom_line(aes(y = bound, color = "bound"))
+  #' return(list("SNC" = bound, "distribution" = d))
 }
 
 length_of_sample <- 2 ** 16
@@ -163,12 +163,9 @@ q <- plot_and_bound(
  arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
  server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std, splits = 20,
  conflevel = level_confidence, iterations = repetitions)
+
 pdf("backlog_distribution.pdf", width = 8, height = 5)
 
 print(q)
-
-# results:
-# SNC-bound: 164.0
-# StatNC-bound: 204.5
 
 dev.off()

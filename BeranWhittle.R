@@ -167,7 +167,7 @@ per <- function(z) {
 ###################
 Qmin <- function (etatry) {
   result <- Qeta(etatry)$B
-  cat("etatry=", etatry, "B=", result, sep = " " , fill = T)
+  cat("etatry=", etatry, "B=", result, sep = " ", fill = T)
   drop(result)
 }
 

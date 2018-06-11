@@ -40,29 +40,29 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 }
 
 #' @examples
-# print("backlog bound:")
-# print(backlog_bound(time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-#                     server_rate = 1.0, arrival_rate = 0.6, tau = 1.0))
+#' print("backlog bound:")
+#' print(backlog_bound(time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#'                     server_rate = 1.0, arrival_rate = 0.6, tau = 1.0))
 #
-# for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
-#   print(paste0("tau: ", tau))
-#   print(paste0("bound: ", backlog_bound(
-#     time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
-#     server_rate = 1.0, arrival_rate = 0.6, tau = tau)))
-# }
+#' for (tau in c(0.1, 0.3, 0.5, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0)) {
+#'   print(paste0("tau: ", tau))
+#'   print(paste0("bound: ", backlog_bound(
+#'     time_n = 10, x = 3.0, std_dev = 0.5, hurst = 0.7,
+#'     server_rate = 1.0, arrival_rate = 0.6, tau = tau)))
+#' }
 
-# numerical evuluation shows that a tau value of 0.85 is optimal for this
-# paramter set
+#' numerical evuluation shows that a tau value of 0.85 is optimal for this
+#' paramter set
 
-# for (x in c(3.0, 5.0, 7.0, 10.0)) {
-#   print("backlog bound:")
-  # print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
-  #                           server_rate = 1.0, arrival_rate = 0.6,
-  #                           tau = 0.85))
-  # print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
-  #                           server_rate = 1.0, arrival_rate = 0.6,
-  #                           tau = 0.9))
-# }
+#' for (x in c(3.0, 5.0, 7.0, 10.0)) {
+#'   print("backlog bound:")
+  #' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+  #'                           server_rate = 1.0, arrival_rate = 0.6,
+  #'                           tau = 0.85))
+  #' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+  #'                           server_rate = 1.0, arrival_rate = 0.6,
+  #'                           tau = 0.9))
+#' }
 
 
 #' Computes the statistical backlog bound based on the FGN increments
@@ -85,15 +85,13 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
     time_n = time_n, x = x, std_dev = std_dev, hurst = hurst,
     server_rate = server_rate, arrival_rate = arrival_rate)
 
-  # print(paste0("x = ", x, ", backlog_stat = ", backlog_stat))
-
   return(backlog_stat)
 }
 
 #' @example
-# print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst = 0.7,
-#                          server_rate = 1.0, arrival_rate = 0.6,
-#                          conflevel = 0.95))
+#' print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst = 0.7,
+#'                          server_rate = 1.0, arrival_rate = 0.6,
+#'                          conflevel = 0.95))
 
 
 #' Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
@@ -136,8 +134,8 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
       server_rate = server_rate, arrival_rate = arrival_rate))
   }
 
-  # Search for the backlog value where bound <= p holds for the first time,
-  # bisect from there
+  #' Search for the backlog value where bound <= p holds for the first time,
+  #' bisect from there
 
   if (estimated_h) {
     probbound <- stat_backlog_bound_short(backlog = backlog)
@@ -156,14 +154,14 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
 
   difference <- difference / 2
   backlog <- backlog - difference
-  # Bisect $splits times
+  #' Bisect $splits times
   while (its < splits) {
     if (estimated_h) {
       probbound <- stat_backlog_bound_short(backlog = backlog)
     } else {
       probbound <- backlog_bound_short(backlog = backlog)
     }
-  # If the bound is smaller -> continue with "left" half, else "right"
+  #' If the bound is smaller -> continue with "left" half, else "right"
     difference <- difference / 2
     if (probbound <= p ) {
       backlog <- backlog - difference
@@ -175,15 +173,15 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
   return(max(0, backlog))
 }
 
-#' @examples 
-# print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
-#                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
-#                     splits = 10, conflevel = 0.999, estimated_h = FALSE))
+#' @examples
+#' print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
+#'                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
+#'                     splits = 10, conflevel = 0.999, estimated_h = FALSE))
 # # result: 13.86328
-# 
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 12, std_dev = 1.0)
-# print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
-#                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
-#                     splits = 10, conflevel = 0.999, estimated_h = TRUE))
+#
+#' flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+#'                            sample_length = 2 ** 12, std_dev = 1.0)
+#' print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
+#'                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
+#'                     splits = 10, conflevel = 0.999, estimated_h = TRUE))
 # # result: 14.08984
