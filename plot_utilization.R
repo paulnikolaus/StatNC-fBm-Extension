@@ -9,12 +9,13 @@ source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
 # Plots the the bound against the utilization.
 
 csv_backlog_vs_util <- function(
-  sample_length, arrival_rate, hurst, time_n, conflevel, iterations,
+  sample_length, arrival_rate, hurst, time_n, conflevel, prob, iterations,
   std_dev = 1.0, splits = 20) {
+    # NOTE: all 1 / iterations have been replaced with prob
   utilizations <- (14:19) / 20
 
-  if ((1 / iterations) < (1 - conflevel)) {
-    stop(paste0("p = ", (1 / iterations), " < (1 - conflevel) = ",
+  if ((prob) < (1 - conflevel)) {
+    stop(paste0("p = ", prob, " < (1 - conflevel) = ",
       1 - conflevel, ". \n
     The bound runs in an infinite loop as the stat_backlog_bound() bound can
     never be below (1-alpha)"))
@@ -32,12 +33,12 @@ csv_backlog_vs_util <- function(
     simulated_backlog[i] <- quantile((compute_distribution(
       arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
       time_n = time_n, server_rate = 1 / util, std_dev = std_dev,
-      iterations = iterations)), probs = 1 - (1 / iterations))
+      iterations = iterations)), probs = 1 - (prob))
     print(paste0("simulated_backlog: ", simulated_backlog[i]))
 
     snc_bound[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev, hurst = hurst,
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
       splits = splits, conflevel = conflevel, estimated_h = FALSE)
     print(paste0("snc_bound: ", snc_bound[i]))
 
@@ -54,20 +55,20 @@ csv_backlog_vs_util <- function(
     stat_mean[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_up_mean",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
     print(paste0("stat_mean: ", stat_mean[i]))
 
     stat_low[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_lower_quant",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
 
     stat_up[i] <- inverse_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_upper_quant",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = 1 / iterations,
+      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
       splits = splits, conflevel = conflevel, estimated_h = TRUE)
 
     i <- i + 1
@@ -129,7 +130,7 @@ plot_backlog_vs_util <- function() {
 csv_backlog_vs_util(
   sample_length = 2 ** 16,
   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200, conflevel = 0.999,
-  iterations = 999, std_dev = 1.0, splits = 20)
+  prob = 1 / 500, iterations = 2000, std_dev = 1.0, splits = 20)
 
 # pdf("backlog_vs_util.pdf", width = 8, height = 5)
 
