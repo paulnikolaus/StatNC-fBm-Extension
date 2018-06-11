@@ -12,6 +12,13 @@ csv_backlog_vs_util <- function(
   sample_length, arrival_rate, hurst, time_n, std_dev = 1.0,
   splits = 20, conflevel = 0.995, iterations = 10 ** 2) {
   utilizations <- (14:19) / 20
+  
+  if ((1 / iterations) < (1 - conflevel)) {
+    stop(paste0("p = ", (1 / iterations), " < (1 - conflevel) = ",
+      1 - conflevel, ". \n
+    The bound runs in an infinite loop as the stat_backlog_bound() bound can
+    never be below (1-alpha)"))
+  }
 
   simulated_backlog <- rep(NA, length(utilizations))
   snc_bound <- rep(NA, length(utilizations))

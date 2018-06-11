@@ -161,6 +161,7 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
 
 # Helper function to calculate confidence intervals
 # of upper confidence interval
+# TODO: delete this function
 ci_help <- function(data, conf.level = 0.95) {
   # Check if all data entries are equal -> No confidence interval
   if (all(data == data[1])) {
@@ -173,30 +174,29 @@ ci_help <- function(data, conf.level = 0.95) {
 
 
 # Compute a confidence interval for the estimation of H
-# conflevel: confidence level of hurst estimation
-# confint.conflevel: confidence level for upper hurst confidence level
-confint_of_h_up <- function(
-  sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
-  confint.conflevel) {
-  hurst_up_estimates <- rep(NA, iterations)
-  for (i in 1:iterations) {
-    f <- build_flow(
-      arrival_rate = arrival_rate, hurst = hurst,
-      sample_length = sample_length, std_dev = std_dev)
-    hurst_up_estimates[i] <- flow_to_h_est_up(
-      flow_increments = f, arrival_rate = arrival_rate,
-      std_dev = std_dev, conflevel = conflevel)$"h_up"
-    # hurst_up_estimates[i] <- flow_to_h_est_up(
-    #   flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
-    #   conflevel = conflevel)$"h_up"
-
-    .show_progress(i, iterations, prog_msg = "confint_of_h_up()")
-  }
-  ci <- ci_help(data = hurst_up_estimates, conf.level = confint.conflevel)
-  m <- mean(hurst_up_estimates)
-
-  return(append(m, ci))
-}
+# TODO: delete this function
+# confint_of_h_up <- function(
+#   sample_length, arrival_rate, hurst, std_dev, conflevel, iterations,
+#   confint.conflevel) {
+#   hurst_up_estimates <- rep(NA, iterations)
+#   for (i in 1:iterations) {
+#     f <- build_flow(
+#       arrival_rate = arrival_rate, hurst = hurst,
+#       sample_length = sample_length, std_dev = std_dev)
+#     hurst_up_estimates[i] <- flow_to_h_est_up(
+#       flow_increments = f, arrival_rate = arrival_rate,
+#       std_dev = std_dev, conflevel = conflevel)$"h_up"
+#     # hurst_up_estimates[i] <- flow_to_h_est_up(
+#     #   flow_increments = f, arrival_rate = arrival_rate, std_dev = std_dev,
+#     #   conflevel = conflevel)$"h_up"
+# 
+#     .show_progress(i, iterations, prog_msg = "confint_of_h_up()")
+#   }
+#   ci <- ci_help(data = hurst_up_estimates, conf.level = confint.conflevel)
+#   m <- mean(hurst_up_estimates)
+# 
+#   return(append(m, ci))
+# }
 
 # print(confint_of_h_up(
 #   sample_length = 2 ** 12, arrival_rate = 1.0, hurst = 0.7, std_dev = 1.0,

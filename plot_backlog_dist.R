@@ -96,6 +96,13 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 plot_and_bound <- function(
   sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
   splits = 20, conflevel = 0.999, iterations = 10 ** 2) {
+  
+  if ((1 / iterations) < (1 - conflevel)) {
+    stop(paste0("p = ", (1 / iterations), " < (1 - conflevel) = ",
+                1 - conflevel, ". \n
+      The bound runs in an infinite loop as the stat_backlog_bound() bound can
+      never be below (1-alpha)"))
+  }
 
   df <- read.csv(file = "backlog_dist_h_confint.csv", header = T)
 
@@ -106,18 +113,6 @@ plot_and_bound <- function(
     arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
     splits = splits, conflevel = conflevel, estimated_h = FALSE)
 
-
-  # h.confint <- confint_of_h_up(
-  #   sample_length = sample_length, arrival_rate = arrival_rate, hurst = hurst,
-  #   std_dev = std_dev, conflevel = conflevel, iterations = iterations,
-  #   confint.conflevel = 0.95)
-
-  # c(h_estimated, h_up, h_up^beta) from interval_h_up_alter()
-  # h_up <- flow_to_h_up(f, arrival_rate = arrival_rate, std_dev = std_dev,
-  #                      conflevel = conflevel)
-  # print(paste0("Hurst_up_mean = ", h.confint[1],
-  #              ", Hurst_up_lower = ", h.confint[2],
-  #              ", Hurst_up_upper = ", h.confint[3]))
   print(paste0("Hurst_lower_quant = ", h.confint[1],
                ", Hurst_up_mean = ", h.confint[2],
                ", Hurst_upper_quant = ", h.confint[3]))

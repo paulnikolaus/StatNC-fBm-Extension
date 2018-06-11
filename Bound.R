@@ -114,9 +114,9 @@ inverse_bound <- function(time_n, std_dev, hurst,
                           estimated_h = FALSE) {
 
   if (estimated_h && p < (1 - conflevel)) {
-    print(paste0("p = ", p, " 1 - conflevel = ", 1 - conflevel))
-    stop("The bound runs in an infinite loop as the stat_backlog_bound()
-         bound can never be below (1-alpha)")
+    stop(paste0("p = ", p, " < (1 - conflevel) = ", 1 - conflevel, ". \n
+The bound runs in an infinite loop as the stat_backlog_bound() bound can never
+                be below (1-alpha)"))
   }
 
   backlog <- 0.5
@@ -186,4 +186,4 @@ inverse_bound <- function(time_n, std_dev, hurst,
 # print(inverse_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
 #                     splits = 10, conflevel = 0.999, estimated_h = TRUE))
-# # result: 15.38672
+# # result: 14.08984
