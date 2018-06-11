@@ -25,12 +25,6 @@ estimate_random_data <- function(estimator_fun) {
   return(estimator_fun(x = fgn_sample)@hurst$"H")
 }
 
-# get_execution_time <- function(fgn_data, estimator_fun) {
-#   return(paste0(
-#     "Approach : ", estimator_fun(x = fgn_data)@method,
-#     ", runtime : ", system.time(estimator_fun(x = fgn_data)@hurst$"H")[3]))
-# }
-
 get_execution_time <- function(fgn_data, estimator_fun, iterations = 100) {
   print(estimator_fun(x = fgn_data)@method)
   data <- foreach(i = 1:iterations, .combine = "c") %do% {
@@ -64,13 +58,15 @@ mean_and_var_estimate <- function(fgn_data, estimator_fun, iterations = 100) {
 print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = aggvarFit))
 print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = diffvarFit))
 print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = absvalFit))
-# print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = higuchiFit))
-# print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = pengFit))
-# rsFit has a high standard deviations
-# print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = rsFit))
+#' print(mean_and_var_estimate(fgn_data = fgn_sample,
+#'                             estimator_fun = higuchiFit))
+#' print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = pengFit))
+#' rsFit has a high standard deviations
+#' print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = rsFit))
 print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = perFit))
-# boxperFit tends to strongly underestimate
-# print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = boxperFit))
+#' boxperFit tends to strongly underestimate
+#' print(mean_and_var_estimate(fgn_data = fgn_sample,
+#'                             estimator_fun = boxperFit))
 
 # results:
 

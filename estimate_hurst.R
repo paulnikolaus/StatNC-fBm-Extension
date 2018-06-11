@@ -57,10 +57,10 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 }
 
 #' @examples
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 14, std_dev = 1.0)
-# print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
-#                      std_dev = 1.0))
+#' flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+#'                            sample_length = 2 ** 14, std_dev = 1.0)
+#' print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
+#'                      std_dev = 1.0))
 
 
 #' Gives the confidence interval for the Hurst estimator
@@ -93,12 +93,12 @@ get_h_up <- function(sample_length, h_estimated, conflevel) {
   return(h_up)
 }
 
-#' @examples
-# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#                            sample_length = 2 ** 12, std_dev = 1.0)
-# sample_length <- length(flow_example)
-# print(get_h_up(sample_length = sample_length, h_estimated = 0.7,
-#                conflevel = 0.95))
+#' @example
+#' flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+#'                            sample_length = 2 ** 12, std_dev = 1.0)
+#' sample_length <- length(flow_example)
+#' print(get_h_up(sample_length = sample_length, h_estimated = 0.7,
+#'                conflevel = 0.95))
 
 
 #' Convenience function for estimation of h's confidence interval
@@ -240,13 +240,14 @@ est_h_up_vector <- function(
   flow_matrix <- sapply(1:iterations, build_flow_iter)
   # dim(flowmatrix) = sample_length  iterations
 
-  # print("hurst_estimates")
-  # print(mean(pbapply(flow_matrix, 2, flow_to_h_est)))
-  # result: 0.7032785
+  #' @example
+  #' print("hurst_estimates")
+  #' print(mean(pbapply(flow_matrix, 2, flow_to_h_est)))
+  #' result: 0.7032785
 
-  # print("hurst_up_estimates")
-  # print(mean(pbapply(flow_matrix, 2, flow_to_h_up)))
-  # result: 0.7112128
+  #' print("hurst_up_estimates")
+  #' print(mean(pbapply(flow_matrix, 2, flow_to_h_up)))
+  #' result: 0.7112128
 
   hurst_up_estimates <- pbapply(flow_matrix, 2, flow_to_h_up)
   # pbapply() = apply() with progress bar

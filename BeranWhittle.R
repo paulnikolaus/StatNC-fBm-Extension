@@ -1,24 +1,24 @@
-## Purpose: Calculation of the spectral density f of
-## normalized fractional Gaussian noise with self-similarity parameter H=h
-## at the Fourier frequencies 2*pi*j/m (j=1,...,(m-1)).
+##' Purpose: Calculation of the spectral density f of
+##' normalized fractional Gaussian noise with self-similarity parameter H=h
+##' at the Fourier frequencies 2*pi*j/m (j=1,...,(m-1)).
 ##
-## Remarks:
-## -------
-## 1. cov(X(t),X(t+k)) = integral[ exp(iuk)f(u)du ]
-## 2. f=theta1*fspec and integral[log(fspec)]=0.
-## -------------------------------------------------------------------------
-## INPUT: m = sample size
-##        h = self-similarity parameter
+##' Remarks:
+##' -------
+##' 1. cov(X(t),X(t+k)) = integral[ exp(iuk)f(u)du ]
+##' 2. f=theta1*fspec and integral[log(fspec)]=0.
+##' -------------------------------------------------------------------------
+##' INPUT: m = sample size
+##'        h = self-similarity parameter
 ##
-## OUTPUT: list(fspec=fspec,theta1=theta1)
-## -------------------------------------------------------------------------
-## Author: Jan Beran;  modified: Martin Maechler, Date: Sep 95.
+##' OUTPUT: list(fspec=fspec,theta1=theta1)
+##' -------------------------------------------------------------------------
+##' Author: Jan Beran;  modified: Martin Maechler, Date: Sep 95.
 
 fspecFGN <- function(eta, m) {
-  # ---------parameters for the calculation of f--------
+  #' ---------parameters for the calculation of f--------
   h <- eta[1]
   nsum <- 200
-  # nsum = m
+  #' nsum = m
   hh <- -2 * h - 1
   const <- 1 / pi * sin(pi * h) * gamma(-hh)
   j <- 2 * pi * c(0:nsum)
@@ -67,13 +67,13 @@ fspecFGN <- function(eta, m) {
 
 CetaFGN <- function(eta) {
   M <- length(eta)
-  # size of steps in Riemann sum: 2*pi/m
+  #' size of steps in Riemann sum: 2*pi/m
   m <- 10000
-  # trunc(): integer part of (m-1)/2
+  #' trunc(): integer part of (m-1)/2
   mhalfm <- trunc((m - 1) / 2)
-  # size of delta for numerical calculation of derivative
+  #' size of delta for numerical calculation of derivative
   delta <- 0.000000001
-  # partial derivatives of log f (at each Fourier frequency)
+  #' partial derivatives of log f (at each Fourier frequency)
   lf <- matrix(1, ncol = M, nrow = mhalfm)
   f_O <- fspecFGN(eta, m)$fspec
   for (j in (1:M)) {
@@ -82,14 +82,14 @@ CetaFGN <- function(eta) {
     fj <- fspecFGN(etaj, m)$fspec
     lf[, j] <- log(fj / f_O) / delta
   }
-  # Calculate D
+  #' Calculate D
   Djl <- matrix(1, ncol = M, nrow = M)
   for (j in (1:M)) {
     for (l in (1:M)) {
       Djl[j, l] <- 2 * 2 * pi / m * sum(lf[, j] * lf[, l])
     }
   }
-  # Result
+  #' Result
   drop(matrix(4 * pi * solve(Djl), ncol = M, nrow = M, byrow = T))
 }
 
@@ -127,17 +127,17 @@ Qeta <- function(eta) {
   theta1 <- fspec$theta1
   fspec <- fspec$fspec
 
-  # if (imodel == 1) {
-  #   fspec <- fspecFGN(eta, n)
-  #   theta1 <- fspec$theta1
-  #   fspec <- fspec$fspec
-  # } else {
-  #   fspec <- fspecARIMA(eta, p, q, n)
-  #   theta1 <- fspec$theta1
-  #   fspec <- fspec$fspec
-  # }
+  #' if (imodel == 1) {
+  #'   fspec <- fspecFGN(eta, n)
+  #'   theta1 <- fspec$theta1
+  #'   fspec <- fspec$fspec
+  #' } else {
+  #'   fspec <- fspecARIMA(eta, p, q, n)
+  #'   theta1 <- fspec$theta1
+  #'   fspec <- fspec$fspec
+  #' }
 
-  # Tn = A / (B ** 2)
+  #' Tn = A / (B ** 2)
   yf <- yper / fspec
   yfyf <- yf ** 2
   A <- 2 * (2 * pi / n) * sum(yfyf)
@@ -172,106 +172,106 @@ Qmin <- function (etatry) {
 }
 
 #' @example
-# #MMMMMMMMMMMMM # Main program #MMMMMMMMMMMMM
-# # read data
-# cat(" in which file are the data ?")
-# filedata <- readline()
-# cat(" total number of observations ?")
-# nmax <- scan(n = 1)
-# cat("first and last observation to be considered (istart, iend) ?")
+#' #MMMMMMMMMMMMM # Main program #MMMMMMMMMMMMM
+#' # read data
+#' cat(" in which file are the data ?")
+#' filedata <- readline()
+#' cat(" total number of observations ?")
+#' nmax <- scan(n = 1)
+#' cat("first and last observation to be considered (istart, iend) ?")
+#'
+#' startend <- c(scan(n = 2)) # > we only look at
+#' istart <- startend[1] # observations
+#' iend <- startend[2] # istart,istart+1,...,end
+#' cat("into how many subseries do you divide the data ?")
+#' nloop <- scan(n = 1)
+#' n <- trunc((iend - istart + 1) / nloop)
+#' nhalfm <- trunc((n - 1) / 2)
+#' # choose model
+#' cat("model: fr.G.noise (1) or fractional ARIMA(p,d,q) (2)?")
+#'
+#'
+#' p <- 0
+#' q <- 0
+#'
+#' #' imodel <- scan(n = 1)
+#' #' p <- 0
+#' #' q <- 0
+#' #' if (imodel == 2) {
+#' #'   cat(" order of AR ?") #
+#' #'   p <- scan(n = 1) #
+#' #'   cat("order of MA ?")
+#' #'   q <- scan(n = 1)
+#' #' }
+#'
+#' # initialize h
+#' cat(" initial estimate of h=?")
+#' h <- scan(n = 1)
+#' eta <- c(h)
+#' # initialize AR parameter
+#' if (p > 0) {
+#'   cat(" initial estimates of AR parameters=?")
+#'  eta[2:(p + 1)] <- scan(n = -p)
+#' }
+#' # initialize MA parameter
+#' if (q > 0) {
+#'   cat(" initial estimates of MA parameters=?")
+#'   eta[(p + 2):(p + q + 1)] <- scan(n = q)
+#' }
+#' M <- length(eta)
+#' # loop
+#' thetavector <- c()
+#' i0 <- istart
+#' for (iloop in (1:nloop)) {
+#'   h <- max(0.2, min(h, 0.9)) # avoid extreme initial values
+#'   eta[1] <- h
+#'   i1 <- i0 + n - 1
+#'   y <- c(scan(filedata, n = nmax))[i0:i1] # read only y[i0:i1]
+#'   # standardize data
+#'   vary <- var(y)
+#'   y <- (y - mean(y)) / sqrt(var(y))
+#'   # periodogram of data
+#'   yper <- per(y)[2:(nhalfm + 1)]
+#'   # find estimate
+#'   s <- 2 * (1.-h)
+#'   etatry <- eta
+#'   # nlmin not part of R. Use nlm() or nlminb() instead
+#'   result <- nlmin(Qmin, etatry, xc.to1 = 0.0000001, init.step = s)
+#'   eta <- result$x
+#'   thetal <- Qeta(eta)$thetal
+#'   theta <- c(thetal, eta)
+#'   thetavector <- c(thetavector, theta)
+#'   # calculate goodness of fit statistic
+#'   Qresult <- Qeta(eta)
+#'   # output
+#'   M <- length(eta)
 #
-# startend <- c(scan(n = 2)) # > we only look at
-# istart <- startend[1] # observations
-# iend <- startend[2] # istart,istart+1,...,end
-# cat("into how many subseries do you divide the data ?")
-# nloop <- scan(n = 1)
-# n <- trunc((iend - istart + 1) / nloop)
-# nhalfm <- trunc((n - 1) / 2)
-# # choose model
-# cat("model: fr.G.noise (1) or fractional ARIMA(p,d,q) (2)?")
+#'   SD <- CetaFGN(eta)
+#'   SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
 #
-#
-# p <- 0
-# q <- 0
-#
-# # imodel <- scan(n = 1)
-# # p <- 0
-# # q <- 0
-# # if (imodel == 2) {
-# #   cat(" order of AR ?") #
-# #   p <- scan(n = 1) #
-# #   cat("order of MA ?")
-# #   q <- scan(n = 1)
-# # }
-#
-# # initialize h
-# cat(" initial estimate of h=?")
-# h <- scan(n = 1)
-# eta <- c(h)
-# # initialize AR parameter
-# if (p > 0) {
-#   cat(" initial estimates of AR parameters=?")
-#   eta[2:(p + 1)] <- scan(n = -p)
-# }
-# # initialize MA parameter
-# if (q > 0) {
-#   cat(" initial estimates of MA parameters=?")
-#   eta[(p + 2):(p + q + 1)] <- scan(n = q)
-# }
-# M <- length(eta)
-# # loop
-# thetavector <- c()
-# i0 <- istart
-# for (iloop in (1:nloop)) {
-#   h <- max(0.2, min(h, 0.9)) # avoid extreme initial values
-#   eta[1] <- h
-#   i1 <- i0 + n - 1
-#   y <- c(scan(filedata, n = nmax))[i0:i1] # read only y[i0:i1]
-#   # standardize data
-#   vary <- var(y)
-#   y <- (y - mean(y)) / sqrt(var(y))
-#   # periodogram of data
-#   yper <- per(y)[2:(nhalfm + 1)]
-#   # find estimate
-#   s <- 2 * (1.-h)
-#   etatry <- eta
-#   # nlmin not part of R. Use nlm() or nlminb() instead
-#   result <- nlmin(Qmin, etatry, xc.to1 = 0.0000001, init.step = s)
-#   eta <- result$x
-#   thetal <- Qeta(eta)$thetal
-#   theta <- c(thetal, eta)
-#   thetavector <- c(thetavector, theta)
-#   # calculate goodness of fit statistic
-#   Qresult <- Qeta(eta)
-#   # output
-#   M <- length(eta)
-#
-#   SD <- CetaFGN(eta)
-#   SD <- matrix(SD, nco1 = M, nrow = M, byrow = T) / n
-#
-#   # if (imodel == 1) {
-#   #   SD <- CetaFGN(eta)
-#   #   SD <- matrix(SD, ncol = M, nrow = M, byrow = T) / n
-#   # } else {
-#   #   SD <- CetaARIMA(eta, p, q)
-#   #   SD <- matrix(SD, ncol = M, nrow, M, byrow = T) / n
-#   # }
-#   Hlow <- eta[1] - 1.96 * sqrt(SD[1, 1])
-#   Hup <- eta[1] + 1.96 * sqrt(SD[1, 1])
-#   cat("theta=", theta, fill = T)
-#   cat("H=", eta[1], fill = T)
-#   cat("95%-C.I. for H: [", Hlow, ",", Hup, "]", fill = T)
-#   etalow <- c()
-#   etaup <- c()
-#   for (i in (1:length(eta))){
-#     etalow <- c(etalow, eta[i] - 1.96 * sqrt(SD[i, i]))
-#     etaup <- c(etaup, eta[i] + 1.96 * sqrt(SD[i, i]))
-#   }
-#   cat("95%-C.I.:", fill = T)
-#   print(cbind(etalow, etaup), fill = T)
-#   cat("periodogram is in yper", fill = T)
-#   fest <- QresultStheta1 * Qresult$fspec
-#   cat(" spectral density is in fest", fill = T)
-#   # next subseries
-#   i0 <- i0 + n
-# }
+#'   #' if (imodel == 1) {
+#'   #'   SD <- CetaFGN(eta)
+#'   #'   SD <- matrix(SD, ncol = M, nrow = M, byrow = T) / n
+#'   #' } else {
+#'   #'   SD <- CetaARIMA(eta, p, q)
+#'   #'   SD <- matrix(SD, ncol = M, nrow, M, byrow = T) / n
+#'   #' }
+#'   Hlow <- eta[1] - 1.96 * sqrt(SD[1, 1])
+#'   Hup <- eta[1] + 1.96 * sqrt(SD[1, 1])
+#'   cat("theta=", theta, fill = T)
+#'   cat("H=", eta[1], fill = T)
+#'   cat("95%-C.I. for H: [", Hlow, ",", Hup, "]", fill = T)
+#'   etalow <- c()
+#'   etaup <- c()
+#'   for (i in (1:length(eta))){
+#'     etalow <- c(etalow, eta[i] - 1.96 * sqrt(SD[i, i]))
+#'     etaup <- c(etaup, eta[i] + 1.96 * sqrt(SD[i, i]))
+#'   }
+#'   cat("95%-C.I.:", fill = T)
+#'   print(cbind(etalow, etaup), fill = T)
+#'   cat("periodogram is in yper", fill = T)
+#'   fest <- QresultStheta1 * Qresult$fspec
+#'   cat(" spectral density is in fest", fill = T)
+#'   # next subseries
+#'   i0 <- i0 + n
+#' }
