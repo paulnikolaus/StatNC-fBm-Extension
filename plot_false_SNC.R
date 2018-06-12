@@ -293,7 +293,9 @@ q <- plot_and_bound(
   server_rate = rate_server, std_dev = sigma_std, splits = 20,
   conflevel = level_confidence, iterations = repetitions)
 
-pdf("backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
+# pdf("backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
+ggsave("backlog_distribution_StatNC_fail.pdf", width = 8, height = 5,
+       device = cairo_pdf)
 
 print(q)
 

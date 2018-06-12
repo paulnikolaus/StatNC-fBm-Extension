@@ -153,10 +153,10 @@ sigma_std <- 1.0
 repetitions <- 500
 level_confidence <- 0.999
 
-generate_values_csv(sample_length = length_of_sample,
-  arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
-  server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std,
-  conflevel = level_confidence, iterations = repetitions)
+# generate_values_csv(sample_length = length_of_sample,
+#   arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
+#   server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std,
+#   conflevel = level_confidence, iterations = repetitions)
 
 q <- plot_and_bound(
  sample_length = length_of_sample,
@@ -164,7 +164,8 @@ q <- plot_and_bound(
  server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std, splits = 20,
  conflevel = level_confidence, iterations = repetitions)
 
-pdf("backlog_distribution.pdf", width = 8, height = 5)
+# pdf("backlog_distribution.pdf", width = 8, height = 5)
+ggsave("backlog_distribution.pdf", width = 8, height = 5, device = cairo_pdf)
 
 print(q)
 

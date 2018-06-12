@@ -132,7 +132,8 @@ plot_backlog_vs_util <- function() {
 #   arrival_rate = 10 ** (-2), hurst = 0.7, time_n = 200, conflevel = 0.999,
 #   prob = 1 / 500, iterations = 5000, std_dev = 1.0, splits = 20)
 
-pdf("backlog_vs_util.pdf", width = 8, height = 5)
+# pdf("backlog_vs_util.pdf", width = 8, height = 5)
+ggsave("backlog_vs_util.pdf", width = 8, height = 5, device = cairo_pdf)
 
 plot_backlog_vs_util()
 
