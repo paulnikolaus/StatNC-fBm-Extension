@@ -37,7 +37,7 @@ backlog_bound_steady <- function(std_dev, hurst, server_rate, arrival_rate) {
   return(numerator / denominator)
 }
 
-#' @examples 
+#' @examples
 sigma <- 1.0
 h <- 0.7
 C <- 3.0
@@ -50,9 +50,9 @@ print("steady-state bound:")
 print(backlog_bound_steady(std_dev = sigma, hurst = h, server_rate = C,
                            arrival_rate = lamb))
 
-#"transient bound:"
-#0.0008727755
-#"steady-state bound:"
-#0.4739116
+#' transient bound:
+#'0.0008727755
+#' steady-state bound:
+#'0.4739116
 
 # We observe that the steady-state bound is about a 1000 times worse
