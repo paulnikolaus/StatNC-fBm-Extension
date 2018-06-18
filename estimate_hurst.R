@@ -1,6 +1,6 @@
 ##### estimate_hurst.R #####
-library("fArma")
-library("FGN")
+library("fArma") # perFit()
+library("FGN") # GetFitFGN()
 # progress bar apply
 library("pbapply")
 
@@ -23,6 +23,7 @@ source("simulation.R")
 #' @param std_dev standard deviation, also denoted as sigma.
 #' @return estimated hurst parameter.
 estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
+   # need fArma package
    # Extract the gaussian noise from flow increments
    fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
@@ -113,8 +114,7 @@ flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
 }
 
 flow_to_h_est_up_get_fit <- function(flow_increments, arrival_rate, std_dev) {
-  # use of FGN-package
-
+  # need FGN-package
   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
   res <- GetFitFGN(z = fgn_traffic, ciQ = TRUE)
