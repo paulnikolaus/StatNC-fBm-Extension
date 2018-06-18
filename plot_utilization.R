@@ -105,14 +105,15 @@ plot_backlog_vs_util <- function() {
     scale_color_manual(
       values = c("aquamarine4", "black", "aquamarine4", "red", "blue")) +
     scale_shape_manual(values = c(20, 19, 20, 18, 17)) +
+    ylim(0.5, max(backlog_bounds_df)) +
 
-    geom_label(aes(x = 0.83, y = max(backlog_bounds_df[3]) * 0.9,
+    geom_label(aes(x = 0.83, y = max(backlog_bounds_df[3]) * 0.85,
                    label = "Mean of StatNC bounds"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.85, max(backlog_bounds_df[5]) * 0.55,
+    geom_label(aes(x = 0.85, max(backlog_bounds_df[5]) * 0.6,
                    label = "SNC Bound"),
                fill = "white", size = 5) +
-    geom_label(aes(x = 0.92, max(backlog_bounds_df[6]) * 0.35,
+    geom_label(aes(x = 0.93, max(backlog_bounds_df[6]) * 0.6,
                    label = "Simulation"), fill = "white", size = 5) +
 
     theme_set(theme_bw(base_size = 19)) +
@@ -121,7 +122,7 @@ plot_backlog_vs_util <- function() {
     #       axis.text = element_text(size = 20)) +
     theme(legend.position = "none") +
     xlab("Utilization") +
-    ylab("Backlog Bound") +
+    ylab("Backlog") +
     theme(legend.title = element_blank())
 
   return(p)
