@@ -5,7 +5,7 @@ library("ggplot2")
 
 plot_h_develop <- function(true_hurst = 0.7) {
   h_df <- read.csv(file = paste0(
-    "h_up_developement_h_true=",
+    "results/h_up_developement_h_true=",
     true_hurst, ".csv"
   ))
 
@@ -54,7 +54,8 @@ plot_h_develop <- function(true_hurst = 0.7) {
   return(p)
 }
 
-ggsave("h_up_development.pdf", width = 8, height = 5, device = cairo_pdf)
+ggsave("results/h_up_development.pdf", width = 8, height = 5,
+  device = cairo_pdf)
 
 print(plot_h_develop())
 

@@ -156,7 +156,7 @@ generate_values_csv <- function(
   df <- data.frame(bl_distribution = d, statnc_ibl)
 
   write.csv(df,
-    file = "backlog_dist_statnc_fail.csv",
+    file = "results/backlog_dist_statnc_fail.csv",
     col.names = TRUE, row.names = FALSE
   )
 }
@@ -255,7 +255,7 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 plot_and_bound <- function(
                            sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
                            splits = 20, conflevel = 0.999, iterations = 10**2) {
-  df <- read.csv(file = "backlog_dist_statnc_fail.csv", header = TRUE)
+  df <- read.csv(file = "results/backlog_dist_statnc_fail.csv", header = TRUE)
 
   snc_bound <- inverse_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
@@ -271,7 +271,8 @@ plot_and_bound <- function(
 
   fail_interval <- compute_statnc_interval(inverse_backlog = df$statnc_ibl)
 
-  df_statnormal <- read.csv(file = "backlog_dist_h_confint.csv", header = TRUE)
+  df_statnormal <- read.csv(file = "results/backlog_dist_h_confint.csv",
+  header = TRUE)
 
   h.confint <- compute_h_up_quantile(h_vector = df_statnormal$hvector)
 
@@ -332,8 +333,8 @@ q <- plot_and_bound(
   conflevel = level_confidence, iterations = repetitions
 )
 
-# pdf("backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
-ggsave("backlog_distribution_StatNC_fail.pdf",
+# pdf("results/backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
+ggsave("results/backlog_distribution_StatNC_fail.pdf",
   width = 8, height = 5,
   device = cairo_pdf
 )

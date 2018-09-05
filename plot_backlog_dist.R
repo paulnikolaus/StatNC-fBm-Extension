@@ -23,7 +23,7 @@ generate_values_csv <- function(
   df <- data.frame(bl_distribution = d, hvector = hvector)
 
   write.csv(df,
-    file = "backlog_dist_h_confint.csv",
+    file = "results/backlog_dist_h_confint.csv",
     col.names = TRUE, row.names = FALSE
   )
 }
@@ -117,7 +117,7 @@ plot_and_bound <- function(
     ))
   }
 
-  df <- read.csv(file = "backlog_dist_h_confint.csv", header = T)
+  df <- read.csv(file = "results/backlog_dist_h_confint.csv", header = T)
 
   h.confint <- compute_h_up_quantile(h_vector = df$hvector)
 
@@ -190,8 +190,9 @@ q <- plot_and_bound(
   conflevel = level_confidence, iterations = repetitions
 )
 
-# pdf("backlog_distribution.pdf", width = 8, height = 5)
-ggsave("backlog_distribution.pdf", width = 8, height = 5, device = cairo_pdf)
+# pdf("results/backlog_distribution.pdf", width = 8, height = 5)
+ggsave("results/backlog_distribution.pdf", width = 8, height = 5,
+  device = cairo_pdf)
 
 print(q)
 
