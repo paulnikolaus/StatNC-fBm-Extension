@@ -1,5 +1,4 @@
 ##### plot_utilization.R #####
-# File to visualize the results
 
 library("reshape2") # melt
 library("ggplot2")

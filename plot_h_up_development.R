@@ -1,5 +1,4 @@
-##### plot_utilization.R #####
-# File to visualize the results
+##### plot_h_up_development.R #####
 
 library("reshape2") # melt
 library("ggplot2")

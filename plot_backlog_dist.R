@@ -1,5 +1,4 @@
 ##### plot_backlog_dist.R #####
-# File to visualize the results
 
 library("ggplot2")
 
