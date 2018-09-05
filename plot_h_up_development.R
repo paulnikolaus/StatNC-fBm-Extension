@@ -55,7 +55,7 @@ plot_h_develop <- function(true_hurst = 0.7) {
     scale_color_manual(values = "blue") +
     scale_shape_manual(values = 20) +
     geom_hline(yintercept = true_hurst, linetype = "solid") +
-    ylim(0.67, max(h_df[, 2])) +
+    ylim(0.67, 0.8) +
 
     geom_label(aes(
       x = 14000, y = mean(h_df[, 2]),
@@ -80,13 +80,13 @@ plot_h_develop <- function(true_hurst = 0.7) {
   return(p)
 }
 
-print(h_development(true_hurst = 0.7))
+# print(h_development(true_hurst = 0.7))
 
-# ggsave("results/h_up_development.pdf",
-#   width = 8, height = 5,
-#   device = cairo_pdf
-# )
-# 
-# print(plot_h_develop(true_hurst = 0.7))
-# 
-# dev.off()
+ggsave("results/h_up_development.pdf",
+  width = 8, height = 5,
+  device = cairo_pdf
+)
+
+print(plot_h_develop(true_hurst = 0.7))
+
+dev.off()
