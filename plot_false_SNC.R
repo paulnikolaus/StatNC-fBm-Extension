@@ -137,8 +137,8 @@ compute_statnc_interval <- function(inverse_backlog, quantile_prob = 0.95) {
 }
 
 generate_values_csv <- function(
-                                sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-                                conflevel = 0.999, iterations = 10**2) {
+  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
+  conflevel = 0.999, iterations = 10**2) {
   d <- compute_distribution(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
@@ -222,7 +222,11 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
     ) +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
     geom_label(aes(
-      x = stat_fail_lower - 0.42 * maximum, y = 0.3,
+      x = stat_fail_lower - 0.5 * maximum, y = 0.5,
+      label = "Backlog Distribution"
+    ), fill = "white", size = 5) +
+    geom_label(aes(
+      x = stat_fail_lower - 0.36 * maximum, y = 0.3,
       label = "StatNC (IID)"
     ), fill = "white", size = 5) +
     geom_label(aes(
@@ -230,7 +234,7 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
       label = "StatNC (LRD)"
     ), fill = "white", size = 5) +
     geom_segment(aes(
-      x = stat_fail_lower - 0.31 * maximum, y = 0.3,
+      x = stat_fail_lower - 0.19 * maximum, y = 0.3,
       xend = stat_fail_mean, yend = 0.3
     ),
     size = 0.4, arrow = NULL
@@ -326,19 +330,22 @@ repetitions <- 500
 #     server_rate = rate_server, std_dev = sigma_std,
 #     conflevel = level_confidence, iterations = repetitions)
 
-q <- plot_and_bound(
+pdf("results/backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
+ggsave("results/backlog_distribution_StatNC_fail.pdf",
+       width = 8, height = 5,
+       device = cairo_pdf
+)
+
+# ggsave("results/backlog_distribution_StatNC_fail_only_iid.pdf",
+#        width = 8, height = 5,
+#        device = cairo_pdf
+# )
+
+print(plot_and_bound(
   sample_length = length_of_sample,
   arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
   server_rate = rate_server, std_dev = sigma_std, splits = 20,
   conflevel = level_confidence, iterations = repetitions
-)
-
-# pdf("results/backlog_distribution_StatNC_fail.pdf", width = 8, height = 5)
-ggsave("results/backlog_distribution_StatNC_fail.pdf",
-  width = 8, height = 5,
-  device = cairo_pdf
-)
-
-print(q)
+))
 
 dev.off()

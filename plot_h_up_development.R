@@ -19,12 +19,12 @@ h_development <- function(true_hurst = 0.7) {
     )
     h_ups[i] <- compute_h_up_quantile(h_vector = h_vec)$"Hurst_up_mean"
   }
-  
+
   h_up_develop <- as.data.frame(cbind(sample_sizes, h_ups))
-  
+
   write.csv(h_up_develop,
-            file = paste0("h_up_development_h_true=", true_hurst, ".csv"),
-            row.names = FALSE
+    file = paste0("h_up_development_h_true=", true_hurst, ".csv"),
+    row.names = FALSE
   )
 }
 

@@ -1,4 +1,4 @@
-##### plot_backlog_dist.R #####
+##### plot_SNC_StatNC.R #####
 
 library("ggplot2")
 
@@ -78,6 +78,10 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
       linetype = "dotted"
     ) +
     geom_text(data = labels, aes(x = x, y = y, label = label)) +
+    geom_label(aes(
+      x = nnb - 0.89 * maximum, y = 0.5,
+      label = "Backlog Distribution"
+    ), fill = "white", size = 5) +
     geom_label(aes(x = nnb - 0.4 * maximum, y = 0.3, label = "SNC"),
       fill = "white", size = 5
     ) +
@@ -106,8 +110,8 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 # the corresponding traditional bound
 
 plot_and_bound <- function(
-                           sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-                           splits = 20, conflevel = 0.999, iterations = 10**2) {
+  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
+  splits = 20, conflevel = 0.999, iterations = 10**2) {
   if ((1 / iterations) < (1 - conflevel)) {
     stop(paste0(
       "p = ", (1 / iterations), " < (1 - conflevel) = ",
@@ -183,17 +187,17 @@ level_confidence <- 0.999
 #   server_rate = 1.5 * (10 ** (-2)), std_dev = sigma_std,
 #   conflevel = level_confidence, iterations = repetitions)
 
-q <- plot_and_bound(
+# pdf("results/backlog_distribution.pdf", width = 8, height = 5)
+ggsave("results/backlog_distribution.pdf",
+  width = 8, height = 5,
+  device = cairo_pdf
+)
+
+print(plot_and_bound(
   sample_length = length_of_sample,
   arrival_rate = rate_arrival, hurst = hurst_param, time_n = n_time,
   server_rate = 1.5 * (10**(-2)), std_dev = sigma_std, splits = 20,
   conflevel = level_confidence, iterations = repetitions
-)
-
-# pdf("results/backlog_distribution.pdf", width = 8, height = 5)
-ggsave("results/backlog_distribution.pdf", width = 8, height = 5,
-  device = cairo_pdf)
-
-print(q)
+))
 
 dev.off()
