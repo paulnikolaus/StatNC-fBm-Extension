@@ -36,7 +36,7 @@ build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
   # says that fbm is otherwise only created in the interval
   # 0, ..., (n - 1) / n
   fbm <- circFBM(n = sample_length, H = hurst, plotfBm = FALSE) * (
-    sample_length ** hurst)
+    sample_length**hurst)
 
   # work_around to avoid completely negative traffic
   # while (mean(fbm) < 0) {
@@ -61,13 +61,14 @@ build_flow <- function(arrival_rate, hurst, sample_length, std_dev = 1.0) {
 #' standard deviation std_dev at a server with the given server rate
 compute_distribution <- function(
   arrival_rate, hurst, sample_length, time_n, server_rate, std_dev = 1.0,
-  iterations = 10 ** 3) {
+  iterations = 10**3) {
   backlogs <- rep(NA, iterations)
 
   for (i in 1:iterations) {
     flow <- build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
-      sample_length = sample_length, std_dev = std_dev)
+      sample_length = sample_length, std_dev = std_dev
+    )
     b <- 0
     for (k in 1:time_n) {
       # Lindley's equation:

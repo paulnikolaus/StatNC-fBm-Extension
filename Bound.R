@@ -31,8 +31,8 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   k <- 1:(floor(time_n / tau) + 1)
 
   exponent <- -((x - server_rate * tau + (
-    server_rate - arrival_rate) * k * tau) ** 2) / (
-    2 * (std_dev ** 2) * (k * tau) ** (2 * hurst))
+    server_rate - arrival_rate) * k * tau)**2) / (
+    2 * (std_dev**2) * (k * tau)**(2 * hurst))
 
   backlog <- sum(exp(exponent))
 
@@ -56,12 +56,12 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 
 #' for (x in c(3.0, 5.0, 7.0, 10.0)) {
 #'   print("backlog bound:")
-  #' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
-  #'                           server_rate = 1.0, arrival_rate = 0.6,
-  #'                           tau = 0.85))
-  #' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
-  #'                           server_rate = 1.0, arrival_rate = 0.6,
-  #'                           tau = 0.9))
+#' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+#'                           server_rate = 1.0, arrival_rate = 0.6,
+#'                           tau = 0.85))
+#' print(backlog_bound(time_n = 10, x = x, std_dev = 0.5, hurst = 0.7,
+#'                           server_rate = 1.0, arrival_rate = 0.6,
+#'                           tau = 0.9))
 #' }
 
 
@@ -83,7 +83,8 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 
   backlog_stat <- (1 - conflevel) + backlog_bound(
     time_n = time_n, x = x, std_dev = std_dev, hurst = hurst,
-    server_rate = server_rate, arrival_rate = arrival_rate)
+    server_rate = server_rate, arrival_rate = arrival_rate
+  )
 
   return(backlog_stat)
 }
@@ -107,10 +108,9 @@ stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 #' @param conflevel confidence level if estimation was used.
 #' @return backlog bound for a given probability.
 inverse_bound <- function(time_n, std_dev, hurst,
-                          arrival_rate, server_rate, p = 10  **  (-3),
+                          arrival_rate, server_rate, p = 10**(-3),
                           splits = 10, conflevel = 0.95,
                           estimated_h = FALSE) {
-
   if (estimated_h && p < (1 - conflevel)) {
     stop(paste0("p = ", p, " < (1 - conflevel) = ", 1 - conflevel, ". \n
 The bound runs in an infinite loop as the stat_backlog_bound() bound can never
@@ -125,13 +125,15 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
     return(stat_backlog_bound(
       time_n = time_n, x = backlog, std_dev = std_dev, hurst = hurst,
       server_rate = server_rate, arrival_rate = arrival_rate,
-      conflevel = conflevel))
+      conflevel = conflevel
+    ))
   }
 
   backlog_bound_short <- function(backlog) {
     return(backlog_bound(
       time_n = time_n, x = backlog, std_dev = std_dev, hurst = hurst,
-      server_rate = server_rate, arrival_rate = arrival_rate))
+      server_rate = server_rate, arrival_rate = arrival_rate
+    ))
   }
 
   #' Search for the backlog value where bound <= p holds for the first time,
@@ -161,9 +163,9 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
     } else {
       probbound <- backlog_bound_short(backlog = backlog)
     }
-  #' If the bound is smaller -> continue with "left" half, else "right"
+    #' If the bound is smaller -> continue with "left" half, else "right"
     difference <- difference / 2
-    if (probbound <= p ) {
+    if (probbound <= p) {
       backlog <- backlog - difference
     } else {
       backlog <- backlog + difference

@@ -7,8 +7,8 @@ library("pbapply")
 source("BeranWhittle.R")
 source("simulation.R")
 
-#'Estimates the Hurst parameter of the given traffic
-#'(we assume Kelly's traffic model) with periodograms
+#' Estimates the Hurst parameter of the given traffic
+#' (we assume Kelly's traffic model) with periodograms
 #' Rose: In most cases, this (i.e., periodogram based estimator)
 #' will lead to a wrong estimate of H
 #' -> better to use other estimator
@@ -23,9 +23,9 @@ source("simulation.R")
 #' @param std_dev standard deviation, also denoted as sigma.
 #' @return estimated hurst parameter.
 estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
-   # needs fArma package
-   # Extract the gaussian noise from flow increments
-   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
+  # needs fArma package
+  # Extract the gaussian noise from flow increments
+  fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
   # old, self-written, periodogram approach
   #' log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
@@ -99,13 +99,17 @@ get_h_up <- function(sample_length, h_estimated, conflevel) {
 #' @param std_dev = std_dev of flow.
 #' @return estimated value, and upper CI as a vector.
 flow_to_h_est_up <- function(flow_increments, arrival_rate, std_dev,
-                                 conflevel) {
+                             conflevel) {
   sample_length <- length(flow_increments)
 
-  h_estimated <- estimate_hurst(flow_increments = flow_increments,
-                                arrival_rate = arrival_rate, std_dev = std_dev)
-  h_up <- get_h_up(sample_length = sample_length, h_estimated = h_estimated,
-                   conflevel = conflevel)
+  h_estimated <- estimate_hurst(
+    flow_increments = flow_increments,
+    arrival_rate = arrival_rate, std_dev = std_dev
+  )
+  h_up <- get_h_up(
+    sample_length = sample_length, h_estimated = h_estimated,
+    conflevel = conflevel
+  )
 
   return(list("h_est" = h_estimated, "h_up" = h_up))
 }
@@ -143,8 +147,10 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
   hurst_hat <- 0.5 * (1 + log2(1 + rho_hat))
 
   # we can only return an interval for the confidence level = 95%
-  return(list("h_est" = hurst_hat,
-              "h_up" = hurst_hat + 2.5 / sqrt(sample_length)))
+  return(list(
+    "h_est" = hurst_hat,
+    "h_up" = hurst_hat + 2.5 / sqrt(sample_length)
+  ))
 }
 
 #' @examples
@@ -162,7 +168,7 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
 #' Compute mean of the confidence interval's upper value
 #' @return vector of estimated h_up's.
 est_h_up_vector <- function(
-  sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
+                            sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
   #' old version with for-loop:
   #' hurst_up_estimates <- rep(NA, iterations)
   #' for (i in 1:iterations) {
@@ -178,13 +184,15 @@ est_h_up_vector <- function(
   build_flow_iter <- function(iter) {
     return(build_flow(
       arrival_rate = arrival_rate, hurst = hurst,
-      sample_length = sample_length, std_dev = std_dev))
+      sample_length = sample_length, std_dev = std_dev
+    ))
   }
 
   flow_to_h_up <- function(flow_increments) {
     return(flow_to_h_est_up(
       flow_increments = flow_increments, arrival_rate = arrival_rate,
-      std_dev = std_dev, conflevel = conflevel)$"h_up")
+      std_dev = std_dev, conflevel = conflevel
+    )$"h_up")
   }
 
   #' flow_to_h_est <- function(flow_increments) {
@@ -219,9 +227,11 @@ compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
   hurst_up_means <- mean(h_vector)
 
   beta <- 1 - quantile_prob
-  return(list("Hurst_lower_quant" = quantile(h_vector, beta / 2)[[1]],
-              "Hurst_up_mean" = hurst_up_means,
-              "Hurst_upper_quant" = quantile(h_vector, 1 - beta / 2)[[1]]))
+  return(list(
+    "Hurst_lower_quant" = quantile(h_vector, beta / 2)[[1]],
+    "Hurst_up_mean" = hurst_up_means,
+    "Hurst_upper_quant" = quantile(h_vector, 1 - beta / 2)[[1]]
+  ))
 }
 
 #' @examples
@@ -230,6 +240,30 @@ compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
 #'                          iterations = 100)
 #' print(compute_h_up_quantile(h_vector = h_ups))
 
+# Show development of H_up for different sample sizes
+#' @param true_hurst Value of the true hurst parameter
+#' @return data frame of mean of h_up fir different sample sizes
+h_development <- function(true_hurst = 0.7) {
+  sample_sizes <- c(2**(10:17))
+  h_ups <- rep(0.0, length(sample_sizes))
+  for (i in 1:length(sample_sizes)) {
+    h_vec <- est_h_up_vector(
+      sample_length = sample_sizes[i], arrival_rate = 1.0,
+      hurst = true_hurst, std_dev = 1.0, conflevel = 0.999,
+      iterations = 500
+    )
+    h_ups[i] <- compute_h_up_quantile(h_vector = h_vec)$"Hurst_up_mean"
+  }
+
+  h_up_develope <- as.data.frame(cbind(sample_sizes, h_ups))
+
+  write.csv(h_up_develope,
+    file = paste0("h_up_developement_h_true=", true_hurst, ".csv"),
+    row.names = FALSE
+  )
+}
+
+print(h_development(true_hurst = 0.7))
 
 # # Helper function to calculate confidence intervals
 # # of upper confidence interval
