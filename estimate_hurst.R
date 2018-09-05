@@ -240,31 +240,6 @@ compute_h_up_quantile <- function(h_vector, quantile_prob = 0.95) {
 #'                          iterations = 100)
 #' print(compute_h_up_quantile(h_vector = h_ups))
 
-# Show development of H_up for different sample sizes
-#' @param true_hurst Value of the true hurst parameter
-#' @return data frame of mean of h_up fir different sample sizes
-h_development <- function(true_hurst = 0.7) {
-  sample_sizes <- c(2**(10:17))
-  h_ups <- rep(0.0, length(sample_sizes))
-  for (i in 1:length(sample_sizes)) {
-    h_vec <- est_h_up_vector(
-      sample_length = sample_sizes[i], arrival_rate = 1.0,
-      hurst = true_hurst, std_dev = 1.0, conflevel = 0.999,
-      iterations = 500
-    )
-    h_ups[i] <- compute_h_up_quantile(h_vector = h_vec)$"Hurst_up_mean"
-  }
-
-  h_up_develope <- as.data.frame(cbind(sample_sizes, h_ups))
-
-  write.csv(h_up_develope,
-    file = paste0("h_up_developement_h_true=", true_hurst, ".csv"),
-    row.names = FALSE
-  )
-}
-
-print(h_development(true_hurst = 0.7))
-
 # # Helper function to calculate confidence intervals
 # # of upper confidence interval
 #' ci_help <- function(data, conf.level = 0.95) {
