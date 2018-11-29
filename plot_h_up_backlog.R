@@ -88,7 +88,7 @@ plot_backlog_develop <- function(true_hurst = 0.7) {
 
     theme_set(theme_bw(base_size = 19)) +
     theme(legend.position = "none") +
-    xlab("Hurst Parameter") +
+    xlab("Estimated Hurst Parameter") +
     ylab("Backlog Bound") +
     theme(legend.title = element_blank())
 
