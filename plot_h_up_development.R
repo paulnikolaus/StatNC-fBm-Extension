@@ -71,7 +71,7 @@ plot_h_develop <- function(true_hurst = 0.7) {
     fill = "white", size = 5
     ) +
 
-    theme_set(theme_bw(base_size = 19)) +
+    theme_bw(base_size = 19) +
     theme(legend.position = "none") +
     xlab("Sample Size") +
     ylab(expression("True H / Estimated H_up")) +

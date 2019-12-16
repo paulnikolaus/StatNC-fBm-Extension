@@ -144,7 +144,7 @@ plot_backlog_vs_util <- function() {
       label = "Simulation"
     ), fill = "white", size = 5) +
 
-    theme_set(theme_bw(base_size = 19)) +
+    theme_bw(base_size = 19) +
     # theme(legend.position = c(0.25, 0.8),
     #       legend.background = element_rect(color = "black"),
     #       axis.text = element_text(size = 20)) +
