@@ -1,8 +1,7 @@
 ##### estimate_hurst.R #####
 library("fArma") # perFit()
 library("FGN") # GetFitFGN()
-# progress bar apply
-library("pbapply")
+library("pbapply") # progress bar apply
 
 source("BeranWhittle.R")
 source("simulation.R")
