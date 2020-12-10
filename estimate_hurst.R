@@ -166,8 +166,8 @@ flow_to_h_est_up_fast <- function(flow_increments, arrival_rate, std_dev) {
 
 #' Compute mean of the confidence interval's upper value
 #' @return vector of estimated h_up's.
-est_h_up_vector <- function(
-                            sample_length, arrival_rate, hurst, std_dev, conflevel, iterations) {
+est_h_up_vector <- function(sample_length, arrival_rate, hurst, std_dev, 
+                            conflevel, iterations) {
   #' old version with for-loop:
   #' hurst_up_estimates <- rep(NA, iterations)
   #' for (i in 1:iterations) {
