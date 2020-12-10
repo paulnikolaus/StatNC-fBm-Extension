@@ -27,13 +27,14 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   fgn_traffic <- (flow_increments - arrival_rate) / std_dev
 
   # old, self-written, periodogram approach
-  #' log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
-  #' log_frequency_short <- use_only_first_part(log_frequency, 0.1)
-  #' log_periodogram <- log(spec.pgram(fgn_traffic, plot = FALSE)$spec)
-  #' log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
-  #' fitted <- lm(log_periodogram_short~log_frequency_short)
-  #' slope <- fitted$coefficients[2]
-  #' h_estimated <- (1 - slope) / 2
+  # log_frequency <- log(spec.pgram(fgn_traffic, plot = FALSE)$freq)
+  # log_frequency_short <- use_only_first_part(log_frequency, 0.1)
+  # log_periodogram <- log(spec.pgram(fgn_traffic, plot = FALSE)$spec)
+  # log_periodogram_short <- use_only_first_part(log_periodogram, 0.1)
+  # fitted <- lm(log_periodogram_short~log_frequency_short)
+  # slope <- fitted$coefficients[2]
+  # h_estimated_periodogram <- (1 - slope) / 2
+  # print(paste0("h_estimated_periodogram = ", h_estimated_periodogram))
 
   h_estimated <- perFit(x = fgn_traffic)@hurst$"H"
 
@@ -48,10 +49,10 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
 }
 
 #' @examples
-#' flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
-#'                            sample_length = 2 ** 14, std_dev = 1.0)
-#' print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
-#'                      std_dev = 1.0))
+# flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
+#                            sample_length = 2 ** 14, std_dev = 1.0)
+# print(estimate_hurst(flow_increments = flow_example, arrival_rate = 1.0,
+#                      std_dev = 1.0))
 
 
 #' Gives the confidence interval for the Hurst estimator
