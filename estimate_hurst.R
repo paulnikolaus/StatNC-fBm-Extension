@@ -42,7 +42,7 @@ estimate_hurst <- function(flow_increments, arrival_rate, std_dev = 1.0) {
   #  an S4 class
 
   if (h_estimated >= 1 || h_estimated <= 0.5) {
-    warning(paste0("h_estimated ", h_estimated, " must be in (0.5, 1)"))
+    warning(paste0("h_estimated = ", h_estimated, " must be in (0.5, 1)"))
   }
 
   return(h_estimated)
