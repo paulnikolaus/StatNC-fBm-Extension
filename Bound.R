@@ -172,14 +172,14 @@ backlog_bound <- function(time_n, std_dev, hurst,
 }
 
 #' @examples
-# print(backlog_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
+# print(backlog_bound(time_n = 100, epsilon = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
 #                     splits = 10, conflevel = 0.999, use_stat_nc = FALSE))
 # # result: 13.86328
 #
 # flow_example <- build_flow(arrival_rate = 1.0, hurst = 0.7,
 #                            sample_length = 2 ** 12, std_dev = 1.0)
-# print(backlog_bound(time_n = 100, p = 10  **  (-2), std_dev = 0.5,
+# print(backlog_bound(time_n = 100, epsilon = 10  **  (-2), std_dev = 0.5,
 #                     hurst = 0.7, arrival_rate = 0.6, server_rate = 1.0,
 #                     splits = 10, conflevel = 0.999, use_stat_nc = TRUE))
 # # result: 14.08984
