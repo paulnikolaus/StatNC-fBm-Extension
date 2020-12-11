@@ -65,7 +65,6 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 
 
 #' Computes the statistical backlog bound based on the FGN increments
-#' (Statistical version of theorem 3.1)
 #' @param time_n Point in Time.
 #' @param x Backlog.
 #' @param std_dev standard deviation.
