@@ -90,10 +90,10 @@ backlog_statnc_violation_prob <- function(time_n, x, std_dev, hurst_up,
 #                                     conflevel = 0.95))
 
 
-#' Binary search for sufficient backlog value x s.t. P(q(n) > x) <= p,
+#' Binary search for sufficient backlog value x s.t. P(q(n) > x) <= epsilon,
 #' last parameter indicates whether SNC or stat_nc bound should be used
 #' @param time_n Point in time.
-#' @param p violation probability.
+#' @param epsilon violation probability.
 #' @param std_dev standard deviation.
 #' @param hurst Hurst parameter.
 #' @param server_rate Server Rate, also known as C in formulas.
@@ -132,8 +132,8 @@ backlog_bound <- function(time_n, std_dev, hurst,
     ))
   }
 
-  #' Search for the backlog value where bound <= p holds for the first time,
-  #' bisect from there
+  #' Search for the backlog value where bound <= epsilon holds for the first 
+  #' time, bisect from there
 
   if (use_stat_nc) {
     probbound <- backlog_statnc_violation_prob_short(backlog = backlog)
