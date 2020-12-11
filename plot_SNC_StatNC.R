@@ -4,11 +4,11 @@ library("ggplot2")
 
 source("simulation.R") #' loads compute_distribution()
 source("estimate_hurst.R") # loads the necessary tools for estimation
-source("Bound.R") #' loads inverse_bound()
+source("Bound.R") #' loads backlog_bound()
 
 generate_values_csv <- function(
-  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-  conflevel = 0.999, iterations = 10**2) {
+                                sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
+                                conflevel = 0.999, iterations = 10**2) {
   d <- compute_distribution(
     arrival_rate = arrival_rate, hurst = hurst, sample_length = sample_length,
     time_n = time_n, server_rate = server_rate, std_dev = std_dev,
@@ -109,15 +109,15 @@ plot_distribution <- function(computed_dist, stat_mean, stat_lower, stat_upper,
 # Computes the empirical backlog distribution and
 # the corresponding traditional bound
 
-plot_and_bound <- function(
-  sample_length, arrival_rate, hurst, time_n, server_rate, std_dev = 1.0,
-  splits = 20, conflevel = 0.999, iterations = 10**2) {
+plot_and_bound <- function(sample_length, arrival_rate, hurst, time_n,
+                           server_rate, std_dev = 1.0, splits = 20,
+                           conflevel = 0.999, iterations = 10**2) {
   if ((1 / iterations) < (1 - conflevel)) {
     stop(paste0(
-      "p = ", (1 / iterations), " < (1 - conflevel) = ",
+      "epsilon = ", (1 / iterations), " < (1 - conflevel) = ",
       1 - conflevel, ". \n
-      The bound runs in an infinite loop as the stat_backlog_bound() bound can
-      never be below (1-alpha)"
+      The bound runs in an infinite loop as the backlog_statnc_violation_prob() 
+      bound can never be below (1-alpha)"
     ))
   }
 
@@ -125,10 +125,11 @@ plot_and_bound <- function(
 
   h.confint <- compute_h_up_quantile(h_vector = df$hvector)
 
-  snc_bound <- inverse_bound(
+  snc_bound <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
-    arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
-    splits = splits, conflevel = conflevel, estimated_h = FALSE
+    arrival_rate = arrival_rate, server_rate = server_rate,
+    epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = FALSE
   )
 
   print(paste0(
@@ -137,27 +138,27 @@ plot_and_bound <- function(
     ", Hurst_upper_quant = ", h.confint[3]
   ))
 
-  stat_mean <- inverse_bound(
+  stat_mean <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_up_mean",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_mean = ", stat_mean))
 
-  stat_lower <- inverse_bound(
+  stat_lower <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_lower_quant",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_lower = ", stat_lower))
 
-  stat_upper <- inverse_bound(
+  stat_upper <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_upper_quant",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_upper = ", stat_upper))
 

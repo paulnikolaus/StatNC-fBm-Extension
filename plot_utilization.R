@@ -3,13 +3,13 @@
 library("reshape2") # melt
 library("ggplot2")
 
-source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
+source("Bound.R") # backlog_bound(), loads estimate_hurst.R and simulation.R
 
 # Plots the the bound against the utilization.
 
-csv_backlog_vs_util <- function(
-  sample_length, arrival_rate, hurst, time_n, conflevel, prob, iterations,
-  std_dev = 1.0, splits = 20) {
+csv_backlog_vs_util <- function(sample_length, arrival_rate, hurst, time_n,
+                                conflevel, prob, iterations,
+                                std_dev = 1.0, splits = 20) {
   # NOTE: all 1 / iterations have been replaced with prob
   utilizations <- (14:19) / 20
 
@@ -17,7 +17,8 @@ csv_backlog_vs_util <- function(
     stop(paste0(
       "p = ", prob, " < (1 - conflevel) = ",
       1 - conflevel, ". \n
-    The bound runs in an infinite loop as the stat_backlog_bound() bound can
+    The bound runs in an infinite loop as the 
+    backlog_statnc_violation_prob() bound can
     never be below (1-alpha)"
     ))
   }
@@ -38,10 +39,10 @@ csv_backlog_vs_util <- function(
     )), probs = 1 - (prob))
     print(paste0("simulated_backlog: ", simulated_backlog[i]))
 
-    snc_bound[i] <- inverse_bound(
+    snc_bound[i] <- backlog_bound(
       time_n = time_n, std_dev = std_dev, hurst = hurst,
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
-      splits = splits, conflevel = conflevel, estimated_h = FALSE
+      arrival_rate = arrival_rate, server_rate = 1 / util, epsilon = prob,
+      splits = splits, conflevel = conflevel, use_stat_nc = FALSE
     )
     print(paste0("snc_bound: ", snc_bound[i]))
 
@@ -57,26 +58,26 @@ csv_backlog_vs_util <- function(
     )
     print(h_up_quantile)
 
-    stat_mean[i] <- inverse_bound(
+    stat_mean[i] <- backlog_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_up_mean",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
-      splits = splits, conflevel = conflevel, estimated_h = TRUE
+      arrival_rate = arrival_rate, server_rate = 1 / util, epsilon = prob,
+      splits = splits, conflevel = conflevel, use_stat_nc = TRUE
     )
     print(paste0("stat_mean: ", stat_mean[i]))
 
-    stat_low[i] <- inverse_bound(
+    stat_low[i] <- backlog_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_lower_quant",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
-      splits = splits, conflevel = conflevel, estimated_h = TRUE
+      arrival_rate = arrival_rate, server_rate = 1 / util, epsilon = prob,
+      splits = splits, conflevel = conflevel, use_stat_nc = TRUE
     )
 
-    stat_up[i] <- inverse_bound(
+    stat_up[i] <- backlog_bound(
       time_n = time_n, std_dev = std_dev,
       hurst = h_up_quantile$"Hurst_upper_quant",
-      arrival_rate = arrival_rate, server_rate = 1 / util, p = prob,
-      splits = splits, conflevel = conflevel, estimated_h = TRUE
+      arrival_rate = arrival_rate, server_rate = 1 / util, epsilon = prob,
+      splits = splits, conflevel = conflevel, use_stat_nc = TRUE
     )
 
     i <- i + 1
@@ -126,7 +127,6 @@ plot_backlog_vs_util <- function() {
     ) +
     scale_shape_manual(values = c(20, 19, 20, 18, 17)) +
     ylim(0.5, max(backlog_bounds_df)) +
-
     geom_label(aes(
       x = 0.83, y = max(backlog_bounds_df[3]) * 0.85,
       label = "Mean of StatNC bounds"
@@ -143,7 +143,6 @@ plot_backlog_vs_util <- function() {
       x = 0.93, max(backlog_bounds_df[6]) * 0.6,
       label = "Simulation"
     ), fill = "white", size = 5) +
-
     theme_bw(base_size = 19) +
     # theme(legend.position = c(0.25, 0.8),
     #       legend.background = element_rect(color = "black"),
@@ -162,8 +161,10 @@ plot_backlog_vs_util <- function() {
 #   prob = 1 / 500, iterations = 5000, std_dev = 1.0, splits = 20)
 
 # pdf("results/backlog_vs_util.pdf", width = 8, height = 5)
-ggsave("results/backlog_vs_util.pdf", width = 8, height = 5,
-  device = cairo_pdf)
+ggsave("results/backlog_vs_util.pdf",
+  width = 8, height = 5,
+  device = cairo_pdf
+)
 
 plot_backlog_vs_util()
 

@@ -7,7 +7,7 @@
 
 library("ggplot2")
 
-source("Bound.R") # inverse_bound(), loads estimate_hurst.R and simulation.R
+source("Bound.R") # backlog_bound(), loads estimate_hurst.R and simulation.R
 
 #' Estimate a lower bound on the distribution parameter lambda, for
 #' exp. i.i.d. arrivals
@@ -49,8 +49,7 @@ nonparametric_estimator <- function(arrivals, conflevel, blimit) {
 #' @param emgf the estimated mgf.
 #' @param server_rate constant rate of the server.
 #' @param theta free variable of every mgf, has to be optimized later.
-statNC_inverse_backlog_theta <- function(
-                                         viol_prob, t_time, conflevel, emgf, server_rate, theta) {
+statNC_backlog_bound_theta <- function(viol_prob, t_time, conflevel, emgf, server_rate, theta) {
   if (viol_prob <= 1 - conflevel) {
     stop("confidence level has to be smaller than violation probability.")
   }
@@ -67,7 +66,7 @@ statNC_optimize_ibl_theta <- function(viol_prob, t_time, conflevel, emgf,
                                       server_rate, blimit, accurate = FALSE) {
   step <- ifelse(accurate == FALSE, blimit / 1000, blimit / 10000)
   theta_vector <- seq(0 + step, blimit - step, step)
-  backlog_vector <- sapply(theta_vector, statNC_inverse_backlog_theta,
+  backlog_vector <- sapply(theta_vector, statNC_backlog_bound_theta,
     viol_prob = viol_prob, t_time = t_time,
     conflevel = conflevel, emgf = emgf,
     server_rate = server_rate
@@ -261,10 +260,10 @@ plot_and_bound <- function(
                            splits = 20, conflevel = 0.999, iterations = 10**2) {
   df <- read.csv(file = "results/backlog_dist_statnc_fail.csv", header = TRUE)
 
-  snc_bound <- inverse_bound(
+  snc_bound <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = hurst,
-    arrival_rate = arrival_rate, server_rate = server_rate, p = 1 / iterations,
-    splits = splits, conflevel = conflevel, estimated_h = FALSE
+    arrival_rate = arrival_rate, server_rate = server_rate, epsilon =  = 1 / iterations,
+    splits = splits, conflevel = conflevel, use_stat_nc = FALSE
   )
 
   # Take the "wrong" estimator now
@@ -280,27 +279,27 @@ plot_and_bound <- function(
 
   h.confint <- compute_h_up_quantile(h_vector = df_statnormal$hvector)
 
-  stat_mean <- inverse_bound(
+  stat_mean <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_up_mean",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_mean = ", stat_mean))
 
-  stat_lower <- inverse_bound(
+  stat_lower <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_lower_quant",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_lower = ", stat_lower))
 
-  stat_upper <- inverse_bound(
+  stat_upper <- backlog_bound(
     time_n = time_n, std_dev = std_dev, hurst = h.confint$"Hurst_upper_quant",
     arrival_rate = arrival_rate,
-    server_rate = server_rate, p = 1 / iterations, splits = splits,
-    conflevel = conflevel, estimated_h = TRUE
+    server_rate = server_rate, epsilon = 1 / iterations, splits = splits,
+    conflevel = conflevel, use_stat_nc = TRUE
   )
   print(paste0("stat_upper = ", stat_upper))
 

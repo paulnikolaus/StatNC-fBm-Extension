@@ -16,20 +16,20 @@ backlog_development <- function(true_hurst = 0.7) {
   h_ups <- sample_h_ups[, 2]
   backlog_bound_stat <- rep(0.0, length(h_ups))
   for (i in 1:length(h_ups)) {
-    backlog_bound_stat[i] <- inverse_bound(
+    backlog_bound_stat[i] <- backlog_bound(
       time_n = 200, std_dev = 1.0, hurst = h_ups[i],
-      arrival_rate = 10**(-2), server_rate = 1.5 * 10**(-2), p = 1 / 500,
+      arrival_rate = 10**(-2), server_rate = 1.5 * 10**(-2), epsilon = 1 / 500,
       splits = 10, conflevel = 0.999,
-      estimated_h = TRUE
+      use_stat_nc = TRUE
     )
   }
 
   h_ups <- c(true_hurst, h_ups)
-  backlog_bound_stat <- c(inverse_bound(
+  backlog_bound_stat <- c(backlog_bound(
     time_n = 200, std_dev = 1.0, hurst = true_hurst,
-    arrival_rate = 10**(-2), server_rate = 1.5 * 10**(-2), p = 1 / 500,
+    arrival_rate = 10**(-2), server_rate = 1.5 * 10**(-2), epsilon = 1 / 500,
     splits = 10, conflevel = 0.999,
-    estimated_h = FALSE
+    use_stat_nc = FALSE
   ), backlog_bound_stat)
 
   backlog_bounds <- as.data.frame(cbind(h_ups, backlog_bound_stat))
