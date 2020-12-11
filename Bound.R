@@ -6,8 +6,7 @@ library("dvfBm")
 source("estimate_hurst.R")
 source("simulation.R")
 
-#' Computes the plain SNC Bound from Theorem 3.10, Equation (3.12)
-#' (without any statistical operations)
+#' Computes the plain SNC Bound 
 #' @param time_n Point in time.
 #' @param x backlog.
 #' @param std_dev standard deviation.
@@ -24,7 +23,7 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
   if (server_rate <= arrival_rate) {
     stop("server rate has to be greater than the arrival rate")
   }
-  if (x - arrival_rate * tau <= 0) {
+  if (x <= arrival_rate * tau) {
     warning("theta's sign constraint is violated")
   }
 
@@ -75,22 +74,16 @@ backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
 #' @param arrival_rate constant arrival rate, also denoted as lambda.
 #' @param conflevel confidence level of estimation.
 #' @return StatNC backlog violation probability.
-stat_backlog_bound <- function(time_n, x, std_dev, hurst, server_rate,
+stat_backlog_bound <- function(time_n, x, std_dev, hurst_up, server_rate,
                                arrival_rate, conflevel = 0.95) {
-  if (server_rate < arrival_rate) {
-    stop("The server rate has to be greater than the arrival rate")
-  }
-
-  backlog_stat <- (1 - conflevel) + backlog_bound(
-    time_n = time_n, x = x, std_dev = std_dev, hurst = hurst,
+  return((1 - conflevel) + backlog_bound(
+    time_n = time_n, x = x, std_dev = std_dev, hurst = hurst_up,
     server_rate = server_rate, arrival_rate = arrival_rate
-  )
-
-  return(backlog_stat)
+  ))
 }
 
 #' @example
-#' print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst = 0.7,
+#' print(stat_backlog_bound(time_n = 100, x = 3.0, std_dev = 1.0, hurst_up = 0.7,
 #'                          server_rate = 1.0, arrival_rate = 0.6,
 #'                          conflevel = 0.95))
 
@@ -123,7 +116,7 @@ The bound runs in an infinite loop as the stat_backlog_bound() bound can never
 
   stat_backlog_bound_short <- function(backlog) {
     return(stat_backlog_bound(
-      time_n = time_n, x = backlog, std_dev = std_dev, hurst = hurst,
+      time_n = time_n, x = backlog, std_dev = std_dev, hurst_up = hurst,
       server_rate = server_rate, arrival_rate = arrival_rate,
       conflevel = conflevel
     ))
