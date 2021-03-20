@@ -1,9 +1,12 @@
 ##### hurst_estimates.R #####
 
-library("fArma")
-library("foreach")
+library(fArma)
+library(foreach)
 
-source("../simulation.R")
+# source("../simulation.R") does not work anymore
+setwd("../")
+source("simulation.R")
+setwd("comparison/")
 
 # Comparison of the hurst estimations in the fArma package
 # Functions are based on
@@ -81,7 +84,6 @@ print(mean_and_var_estimate(fgn_data = fgn_sample, estimator_fun = perFit))
 #"Peng Method"
 #"overall time: 71.414"
 #"R/S Method"
-#
 #"overall time: 0.504000000000019"
 #"Periodogram Method"
 #"overall time: 0.522000000000048"
